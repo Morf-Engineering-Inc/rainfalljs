@@ -1,6 +1,6 @@
-import babel from 'rollup-plugin-babel';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import babel from '@rollup/plugin-babel';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
@@ -11,6 +11,7 @@ const external = [
   ...Object.keys(pkg.peerDependencies || {}),
   ...Object.keys(pkg.dependencies || {}),
   'react/jsx-runtime',
+  /@babel\/runtime/
 ];
 
 // Base configuration for all builds
@@ -19,16 +20,24 @@ const baseConfig = {
   plugins: [
     // Resolve node_modules
     resolve({ extensions }),
-    // Convert CommonJS modules to ES6
-    commonjs(),
     // Transpile with Babel
     babel({
       extensions,
       exclude: 'node_modules/**',
-      runtimeHelpers: true,
+      babelHelpers: 'runtime',
+      presets: [
+        '@babel/preset-env',
+        ['@babel/preset-react', { runtime: 'automatic' }]
+      ]
     }),
+    // Convert CommonJS modules to ES6
+    commonjs({
+      include: 'node_modules/**',
+      // React specific configuration
+      transformMixedEsModules: true
+    })
   ],
-  external,
+  external
 };
 
 export default [
@@ -54,7 +63,7 @@ export default [
   {
     ...baseConfig,
     output: {
-      name: 'ReactDataProvider',
+      name: 'RainfallJS',
       file: 'dist/index.umd.js',
       format: 'umd',
       globals: {

@@ -1,0 +1,67 @@
+{
+  "name": "@morf_engineering/rainfalljs",
+  "version": "0.1.0",
+  "description": "Automated, secure and reliable data integration for React and Next.js components",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+  "clean": "rm -rf dist",
+  "build": "npm run clean && npm run build:cjs && npm run build:esm",
+  "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir dist --extensions '.js,.jsx'",
+  "build:esm": "cross-env BABEL_ENV=esm babel src --out-dir dist/esm --extensions '.js,.jsx'",
+  "prepublishOnly": "npm run build"
+},
+  "keywords": [
+    "react",
+    "nextjs",
+    "data",
+    "provider",
+    "context",
+    "state",
+    "automation"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/morf_engineering/rainfalljs.git"
+  },
+  "homepage": "https://github.com/morf_engineering/rainfalljs",
+  "bugs": {
+    "url": "https://github.com/morf_engineering/rainfalljs/issues"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.26.4",
+    "@babel/core": "^7.26.9",
+    "@babel/plugin-transform-runtime": "^7.26.9",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/runtime": "^7.26.9",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "cross-env": "^7.0.3",
+    "microbundle": "^0.15.1",
+    "rimraf": "^6.0.1",
+    "rollup": "^2.79.2",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-terser": "^7.0.2"
+  }
+}
