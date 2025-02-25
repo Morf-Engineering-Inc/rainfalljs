@@ -1,6 +1,6 @@
 {
   "name": "@morf_engineering/rainfalljs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Automated, secure and reliable data integration for React and Next.js components",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -10,12 +10,12 @@
     "README.md"
   ],
   "scripts": {
-  "clean": "rm -rf dist",
-  "build": "npm run clean && npm run build:cjs && npm run build:esm",
-  "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir dist --extensions '.js,.jsx'",
-  "build:esm": "cross-env BABEL_ENV=esm babel src --out-dir dist/esm --extensions '.js,.jsx'",
-  "prepublishOnly": "npm run build"
-},
+    "clean": "rm -rf dist",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir dist --extensions '.js,.jsx'",
+    "build:esm": "cross-env BABEL_ENV=esm babel src --out-dir dist/esm --extensions '.js,.jsx'",
+    "prepublishOnly": "npm run build"
+  },
   "keywords": [
     "react",
     "nextjs",
