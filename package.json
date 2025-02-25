@@ -1,6 +1,6 @@
 {
   "name": "@morf_engineering/rainfalljs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Automated, secure and reliable data integration for React and Next.js components",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",

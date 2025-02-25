@@ -155,7 +155,64 @@ function UserTable() {
   return <Table {...mappedProps} />;
 }
 ```
+Here's a snippet for your README that highlights the Radix UI integration:
 
+```markdown
+
+### Radix UI Integration
+
+RainfallJS provides seamless integration with Radix UI's unstyled, accessible components:
+
+```jsx
+import { DataProvider, registerRadixComponents, useComponentData } from '@morf_engineering/rainfalljs';
+import * as Select from '@radix-ui/react-select';
+
+// Register Radix UI component mappings (do this once in your app)
+registerRadixComponents();
+
+// Example: Radix UI Select with automatic data mapping
+function UserSelect() {
+  const { mappedProps, loading, error } = useComponentData('radix', 'Select', {
+    valueField: 'id',
+    labelField: 'name'
+  });
+  
+  if (loading) return <div>Loading...</div>;
+  
+  return (
+    <Select.Root>
+      <Select.Trigger>
+        <Select.Value placeholder="Select a user" />
+        <Select.Icon />
+      </Select.Trigger>
+      
+      <Select.Portal>
+        <Select.Content>
+          <Select.Viewport>
+            {mappedProps.items.map((item) => (
+              <Select.Item key={item.value} value={item.value}>
+                <Select.ItemText>{item.label}</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+            ))}
+          </Select.Viewport>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+  );
+}
+
+// Use it with your data provider
+function UserSelection() {
+  return (
+    <DataProvider source="/api/users">
+      <UserSelect />
+    </DataProvider>
+  );
+}
+```
+
+RainfallJS handles the complexities of Radix UI's compound component pattern, automatically mapping your data to the appropriate format for Radix components like Select, Dialog, and Tabs.
 ## Advanced Usage
 
 ### Custom Data Sources
