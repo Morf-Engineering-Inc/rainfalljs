@@ -1,4 +1,4 @@
-# React Data Provider
+# RainfallJS
 
 react-data-provider/
 ├── src/
@@ -8,6 +8,7 @@ react-data-provider/
 ├── dist/
 ├── examples/
 └── package.json
+
 A comprehensive data integration solution for React and Next.js applications that provides automated, secure, and reliable data handling.
 
 ## Features
@@ -21,10 +22,10 @@ A comprehensive data integration solution for React and Next.js applications tha
 ## Installation
 
 ```bash
-npm install react-data-provider
+npm install @morf_engineering/rainfalljs
 
 # or if you use yarn
-yarn add react-data-provider
+yarn add @morf_engineering/rainfalljs
 ```
 
 ## Basic Usage
@@ -32,7 +33,7 @@ yarn add react-data-provider
 ### Simple Data Provider
 
 ```jsx
-import { DataProvider, useData } from 'react-data-provider';
+import { DataProvider, useData } from '@morf_engineering/rainfalljs';
 
 // Your component that needs data
 const UserProfile = () => {
@@ -60,7 +61,7 @@ const App = () => (
 ### Next.js Integration
 
 ```jsx
-import { NextDataProvider } from 'react-data-provider';
+import { NextDataProvider } from '@morf_engineering/rainfalljs';
 
 // Your Next.js page
 export default function Dashboard({ initialData }) {
@@ -100,7 +101,7 @@ export const getServerSideProps = withServerSideData(
 
 ```jsx
 // pages/api/users.js
-import { createApiRoute } from 'react-data-provider';
+import { createApiRoute } from '@morf_engineering/rainfalljs';
 
 export default createApiRoute(
   async (req, res) => {
@@ -120,7 +121,7 @@ export default createApiRoute(
 ### Custom Data Sources
 
 ```jsx
-import { createDataSource, DataProvider } from 'react-data-provider';
+import { createDataSource, DataProvider } from '@morf_engineering/rainfalljs';
 
 // Create a custom data source
 const userDataSource = createDataSource({
@@ -167,7 +168,7 @@ const App = () => (
 ### With Class Components
 
 ```jsx
-import { withData } from 'react-data-provider';
+import { withData } from '@morf_engineering/rainfalljs';
 
 class UserProfile extends React.Component {
   render() {
