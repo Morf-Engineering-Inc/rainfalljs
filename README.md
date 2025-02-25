@@ -6,6 +6,11 @@
 [![npm downloads](https://img.shields.io/npm/dm/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
 
 A comprehensive data integration solution for React and Next.js applications that provides automated, secure, and reliable data handling.
+https://react.dev/learn/thinking-in-react
+GOALS inspired by nature's beauty by rainfall - . Elon Musk idea. about applying from other fields. 
+Rain Cycle -- data should flow down to grow your app components ui naturally 
+Ai integration coming soon for mock data and testing. 
+
 
 ## Features
 
