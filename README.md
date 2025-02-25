@@ -1,18 +1,9 @@
 # RainfallJS
-![Build Status](https://github.com/morf_engineering/rainfalljs/actions/workflows/publish.yml/badge.svg)
+
+[![Build Status](https://github.com/morf_engineering/rainfalljs/actions/workflows/publish.yml/badge.svg)](https://github.com/morf_engineering/rainfalljs/actions)
 [![npm version](https://img.shields.io/npm/v/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm downloads](https://img.shields.io/npm/dm/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
-[![Coverage Status](https://coveralls.io/repos/github/morf_engineering/rainfalljs/badge.svg?branch=main)](https://coveralls.io/github/morf_engineering/rainfalljs?branch=main)
-
-react-data-provider/
-├── src/
-│   ├── core/
-│   ├── next/
-│   └── index.js
-├── dist/
-├── examples/
-└── package.json
 
 A comprehensive data integration solution for React and Next.js applications that provides automated, secure, and reliable data handling.
 
@@ -23,6 +14,7 @@ A comprehensive data integration solution for React and Next.js applications tha
 - 🚀 **Next.js Integration** - Special features for Next.js applications
 - ⚡ **Performance Optimized** - Smart caching and minimal re-renders
 - 🧩 **Component Agnostic** - Works with both functional and class components
+- 🎛️ **Component Library Integration** - Automatic mapping to UI component libraries
 
 ## Installation
 
@@ -89,7 +81,7 @@ export default function Dashboard({ initialData }) {
 }
 
 // Server-side data fetching
-import { withServerSideData } from 'react-data-provider';
+import { withServerSideData } from '@morf_engineering/rainfalljs';
 
 export const getServerSideProps = withServerSideData(
   async (context) => {
@@ -119,6 +111,49 @@ export default createApiRoute(
     exposeErrors: process.env.NODE_ENV !== 'production'
   }
 );
+```
+
+## Component Library Integration
+
+RainfallJS provides automatic data mapping to UI component libraries like Material-UI and Ant Design:
+
+```jsx
+import { DataProvider, withComponentData, registerMUIComponents } from '@morf_engineering/rainfalljs';
+import { DataGrid } from '@mui/x-data-grid';
+
+// Register Material UI components (do this once in your app)
+registerMUIComponents();
+
+// Create a mapped component
+const UsersGrid = withComponentData(DataGrid, 'mui', 'DataGrid');
+
+// Use it with your data provider
+function UsersList() {
+  return (
+    <DataProvider source="/api/users">
+      <UsersGrid />
+    </DataProvider>
+  );
+}
+```
+
+### Using Hooks Pattern
+
+```jsx
+import { useData, useComponentData } from '@morf_engineering/rainfalljs';
+import { Table } from 'antd';
+
+function UserTable() {
+  // Get the component props automatically mapped from your data
+  const { mappedProps } = useComponentData('antd', 'Table', {
+    headers: {
+      userId: 'User ID',
+      fullName: 'Full Name'
+    }
+  });
+  
+  return <Table {...mappedProps} />;
+}
 ```
 
 ## Advanced Usage
@@ -225,7 +260,43 @@ HOC for connecting class components to data.
 - `Component` (Component): React component to enhance
 - `mapDataToProps` (Function, optional): Maps data to component props
 
-### `NextDataProvider`
+### Component Library Integration
+
+#### `registerComponentLibrary`
+
+Register mapping functions for a component library.
+
+**Parameters:**
+- `libraryName` (String): Name of the component library
+- `mappings` (Object): Object with component mappings
+
+#### `withComponentData`
+
+HOC that connects a component to data with automatic prop mapping.
+
+**Parameters:**
+- `Component` (Component): React component to enhance
+- `libraryName` (String): Name of the registered library
+- `componentType` (String): Type of component in the library
+- `options` (Object): Mapping options and overrides
+
+#### `useComponentData`
+
+Hook version for functional components.
+
+**Parameters:**
+- `libraryName` (String): Name of the registered library
+- `componentType` (String): Type of component in the library
+- `options` (Object): Mapping options and overrides
+
+**Returns:**
+- `loading` (Boolean): Loading state
+- `error` (String): Error message if any
+- `mappedProps` (Object): Props mapped from data
+
+### Next.js Integration
+
+#### `NextDataProvider`
 
 Enhanced provider for Next.js applications.
 
@@ -233,7 +304,7 @@ Enhanced provider for Next.js applications.
 - `routeMapping` (Object): Map of routes to data sources
 - `defaultSource` (String|Function): Default data source if no route match
 
-### `withServerSideData`
+#### `withServerSideData`
 
 HOC for Next.js getServerSideProps.
 
@@ -241,19 +312,13 @@ HOC for Next.js getServerSideProps.
 - `getServerSideProps` (Function, optional): Original getServerSideProps
 - `options` (Object): Data fetching options
 
-### `createApiRoute`
+#### `createApiRoute`
 
 Helper for creating secure Next.js API routes.
 
 **Parameters:**
 - `handler` (Function): API route handler function
 - `options` (Object): Security and validation options
-
-## License
-
-MIT
-
-
 
 # FAQ
 
@@ -330,3 +395,6 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 
 Yes, RainfallJS is designed for production use in React and Next.js applications. The package is optimized for performance and has minimal dependencies.
 
+## License
+
+MIT

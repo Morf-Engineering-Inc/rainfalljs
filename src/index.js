@@ -2,6 +2,15 @@
 import { DataProvider, useData, withData, createDataSource } from './core/data-provider';
 import { NextDataProvider, withServerSideData, createApiRoute } from './next/next-data-provider';
 
+// New component mapping feature
+import { 
+  registerComponentLibrary,
+  withComponentData,
+  useComponentData,
+  registerMUIComponents,
+  registerAntDesignComponents
+} from './core/component-mapper';
+
 // Core exports
 export { 
   DataProvider, 
@@ -15,6 +24,16 @@ export {
   NextDataProvider,
   withServerSideData,
   createApiRoute
+};
+
+// Component mapping exports
+export {
+  registerComponentLibrary,
+  withComponentData,
+  useComponentData,
+  registerMUIComponents,
+  registerAntDesignComponents,
+  registerRadixComponents
 };
 
 // Default export
