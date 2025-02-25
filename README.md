@@ -1,4 +1,9 @@
 # RainfallJS
+![Build Status](https://github.com/morf_engineering/rainfalljs/actions/workflows/publish.yml/badge.svg)
+[![npm version](https://img.shields.io/npm/v/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm downloads](https://img.shields.io/npm/dm/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
+[![Coverage Status](https://coveralls.io/repos/github/morf_engineering/rainfalljs/badge.svg?branch=main)](https://coveralls.io/github/morf_engineering/rainfalljs?branch=main)
 
 react-data-provider/
 ├── src/
@@ -324,3 +329,4 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 ## Can I use RainfallJS in production?
 
 Yes, RainfallJS is designed for production use in React and Next.js applications. The package is optimized for performance and has minimal dependencies.
+
