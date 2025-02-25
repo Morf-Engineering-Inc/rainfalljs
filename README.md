@@ -247,3 +247,80 @@ Helper for creating secure Next.js API routes.
 ## License
 
 MIT
+
+
+
+# FAQ
+
+## What is RainfallJS?
+
+RainfallJS is a specialized data integration solution for React and Next.js applications that makes it easy to fetch, manage, and distribute data across your components with minimal boilerplate.
+
+## Does RainfallJS use React's Context API?
+
+Yes, RainfallJS is built on top of React's Context API. Rather than replacing Context, it enhances it with automated data fetching, transformation, validation, and error handling capabilities specifically designed for component data management.
+
+## What problem does RainfallJS solve?
+
+RainfallJS solves several common issues in React/Next.js applications:
+
+1. **Repetitive data fetching logic** - No need to write the same fetch/state management code for every data source
+2. **Prop drilling** - Access data anywhere in your component tree without passing props through multiple layers
+3. **Loading & error states** - Unified handling of loading indicators and error messages
+4. **Next.js specific challenges** - Integration with SSR and route-based data fetching
+5. **Security concerns** - Built-in authentication header management and data validation
+
+## How is this different from Redux, MobX, or React Query?
+
+- **Redux/MobX**: RainfallJS is more lightweight and focused specifically on component data needs rather than global application state.
+- **React Query**: While React Query is excellent for data fetching, RainfallJS provides a more unified context-based approach for data sharing across components and includes Next.js-specific optimizations.
+- **SWR**: Similar to React Query, SWR focuses on data fetching and caching. RainfallJS provides a more complete data distribution system with both hooks and HOCs.
+
+## Can I use RainfallJS with class components?
+
+Yes! While many modern data libraries only work with hooks, RainfallJS supports both functional components (via the `useData` hook) and class components (via the `withData` HOC).
+
+## Does RainfallJS work with Server-Side Rendering (SSR)?
+
+Absolutely. RainfallJS has specific features for Next.js that support SSR through the `withServerSideData` higher-order component, ensuring your data is available during server rendering.
+
+## Can I transform or validate data before it reaches my components?
+
+Yes, RainfallJS allows you to provide transformation and validation functions as options:
+
+```jsx
+<DataProvider 
+  source="/api/data"
+  options={{
+    transform: (data) => {
+      // Transform data before it reaches components
+      return data.map(item => ({
+        ...item,
+        fullName: `${item.firstName} ${item.lastName}`
+      }));
+    },
+    validate: (data) => {
+      // Validate data structure
+      return Array.isArray(data) && data.length > 0;
+    }
+  }}
+>
+  <YourComponent />
+</DataProvider>
+```
+
+## Is RainfallJS secure?
+
+RainfallJS includes built-in security features, including:
+- Authentication header management
+- Data validation before rendering
+- API route protection helpers for Next.js
+- Error sanitization to prevent leaking sensitive information
+
+## How can I contribute to RainfallJS?
+
+Contributions are welcome! Please feel free to submit a pull request or open an issue on our [GitHub repository](https://github.com/morf_engineering/rainfalljs).
+
+## Can I use RainfallJS in production?
+
+Yes, RainfallJS is designed for production use in React and Next.js applications. The package is optimized for performance and has minimal dependencies.
