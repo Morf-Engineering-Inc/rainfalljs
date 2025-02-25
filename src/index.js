@@ -8,7 +8,8 @@ import {
   withComponentData,
   useComponentData,
   registerMUIComponents,
-  registerAntDesignComponents
+  registerAntDesignComponents,
+  registerRadixComponents
 } from './core/component-mapper';
 
 // Core exports
