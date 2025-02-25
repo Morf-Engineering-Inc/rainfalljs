@@ -1,0 +1,51 @@
+{
+  "name": "@morf_engineering/rainfalljs",
+  "version": "0.1.0",
+  "description": "Automated, secure and reliable data integration for React and Next.js components",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "react",
+    "nextjs",
+    "data",
+    "provider",
+    "context",
+    "state",
+    "automation"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/morf_engineering/rainfalljs.git"
+  },
+  "homepage": "https://github.com/morf_engineering/rainfalljs",
+  "bugs": {
+    "url": "https://github.com/morf_engineering/rainfalljs/issues"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  }
+}
