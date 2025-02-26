@@ -1,6 +1,6 @@
 # RainfallJS
 
-[![Build Status](https://github.com/morf_engineering/rainfalljs/actions/workflows/publish.yml/badge.svg)](https://github.com/morf_engineering/rainfalljs/actions)
+[![Build Status](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/publish.yml/badge.svg)](https://github.com/morf_engineering/rainfalljs/actions)
 [![Tests](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml/badge.svg)](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml)
 [![npm version](https://img.shields.io/npm/v/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
