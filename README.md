@@ -946,6 +946,29 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 
 Yes, RainfallJS is designed for production use in React and Next.js applications. The package is optimized for performance and has minimal dependencies.
 
+## Can I develop complex apps with RainfallJS?
+
+RainfallJS could certainly be used to build complex applications, but with a different architectural approach than Redux for example.
+Here's how users could build complex apps with RainfallJS:
+
+Composable Data Providers: Users can nest multiple DataProviders for different sections of the application, creating a hierarchy of data sources that maps to the component structure.
+Domain-Specific Providers: Each feature area could have its own DataProvider with specific transformations and validations, allowing separation of concerns.
+Hybrid Approach: RainfallJS could handle all the data fetching and distribution needs, while using simpler state management (like useReducer) for UI state and interactions.
+Cross-Provider Communication: For interactions between data domains, users could implement custom data sources that access and combine data from multiple endpoints.
+
+The key difference is philosophical:
+
+Redux centralizes all state in a single store with explicit actions
+RainfallJS distributes data management closer to where it's used, following React's component model
+
+For many complex applications, RainfallJS's approach may actually be more maintainable because it:
+
+Keeps data concerns closer to the components that need them
+Results in more modular, decoupled code
+Aligns better with React's component-based architecture
+
+The trade-off is that RainfallJS doesn't offer some of Redux's specialized tools like time-travel debugging or the Redux DevTools. However, for most applications focused on data fetching and component integration, these tools aren't essential, and the simplicity benefits outweigh this loss.
+
 ## License
 
 MIT
