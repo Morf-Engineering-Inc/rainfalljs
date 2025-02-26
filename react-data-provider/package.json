@@ -1,7 +1,6 @@
 {
   "name": "react-data-provider",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "directories": {
     "example": "examples"
@@ -18,8 +17,8 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
     "next": "^15.1.7",
-    "react": "*",
-    "react-dom": "*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "rimraf": "^6.0.1",
     "rollup": "^2.79.2",
     "rollup-plugin-babel": "^4.4.0",
@@ -33,5 +32,6 @@
   },
   "optionalDependencies": {
     "next": "^15.1.7"
-  }
+  },
+  "description": ""
 }
