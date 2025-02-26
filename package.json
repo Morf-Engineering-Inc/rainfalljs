@@ -29,11 +29,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/morf_engineering/rainfalljs.git"
+    "url": "https://github.com/Morf-Engineering-Inc/rainfalljs"
   },
-  "homepage": "https://github.com/morf_engineering/rainfalljs",
+  "homepage": "https://github.com/Morf-Engineering-Inc/rainfalljs",
   "bugs": {
-    "url": "https://github.com/morf_engineering/rainfalljs/issues"
+    "url": "https://github.com/Morf-Engineering-Inc/rainfalljs/issues"
   },
   "peerDependencies": {
     "react": "^19.0.0",
