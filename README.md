@@ -1,6 +1,7 @@
 # RainfallJS
 
 [![Build Status](https://github.com/morf_engineering/rainfalljs/actions/workflows/publish.yml/badge.svg)](https://github.com/morf_engineering/rainfalljs/actions)
+[![Tests](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml/badge.svg)](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml)
 [![npm version](https://img.shields.io/npm/v/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm downloads](https://img.shields.io/npm/dm/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
@@ -158,7 +159,6 @@ function UserTable() {
   return <Table {...mappedProps} />;
 }
 ```
-Here's a snippet for your README that highlights the Radix UI integration:
 
 ```markdown
 
@@ -513,8 +513,6 @@ const Dashboard = () => {
 
 export default Dashboard;
 ```
-
-Here's a README snippet to document this shadcn/ui integration:
 
 ```markdown
 ### shadcn/ui Integration
@@ -949,7 +947,7 @@ Yes, RainfallJS is designed for production use in React and Next.js applications
 ## Can I develop complex apps with RainfallJS?
 
 RainfallJS could certainly be used to build complex applications, but with a different architectural approach than Redux for example.
-Here's how users could build complex apps with RainfallJS:
+Here's how you could build complex apps with RainfallJS:
 
 Composable Data Providers: Users can nest multiple DataProviders for different sections of the application, creating a hierarchy of data sources that maps to the component structure.
 Domain-Specific Providers: Each feature area could have its own DataProvider with specific transformations and validations, allowing separation of concerns.
