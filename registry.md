@@ -1,7 +1,7 @@
 regisger in the number sytem with screen and needs and compoennten id 
 add this to my rainfall once I generalize this and process deconstruct
 see this file   `backend-data/data_fields_types/registry_rainfall/add.md`
-
+ADD this for use with the AI analyst and automated github project manager pm FA 
 NEEDS file 
 map
 
