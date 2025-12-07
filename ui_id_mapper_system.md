@@ -1,4 +1,5 @@
 **Yes — systematically labeling UI components in a React Native app with a structured naming convention (like data-ui-id-name) is an excellent idea if you want to:
+<img width="1252" height="444" alt="image" src="https://github.com/user-attachments/assets/37d3163e-84c5-4d6f-8a7d-2c70820c095e" />
 
 ✅ Track user interactions systematically (analytics, heatmaps, A/B testing).
 ✅ Identify bugs more easily (log errors with specific component references).
