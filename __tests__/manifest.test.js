@@ -144,6 +144,18 @@ describe('buildReport', () => {
 });
 
 describe('rainfall CLI', () => {
+  it('prints the AI bootstrap prompt', () => {
+    const output = execFileSync(
+      process.execPath,
+      [path.join(__dirname, '..', 'bin', 'rainfall.js'), 'prompt'],
+      { encoding: 'utf8' }
+    );
+    expect(output).toContain('rainfall.json');
+    expect(output).toContain('Step 1');
+    expect(output).toContain('validate');
+    expect(output).toContain('"rainfall": "1.0"');
+  });
+
   it('condenses the example manifest end-to-end', () => {
     const output = execFileSync(
       process.execPath,

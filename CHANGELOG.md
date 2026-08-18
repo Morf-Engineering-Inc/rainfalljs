@@ -18,6 +18,9 @@ knowledge about your app's data layer flows into (and back out of) AI coding ses
   - `rainfall report` — tokens-saved report comparing the digest against the cost
     of reading the mapped source files (and the whole project); missing mapped
     files are flagged as manifest drift
+  - `rainfall prompt` — prints paste-ready AI instructions that walk any coding
+    assistant through building and enriching the manifest (seed with scan, add
+    entities/reads/writes/flows from the code, verify, keep it updated)
 - **AI agent skill** (`skills/rainfall-manifest/SKILL.md`): teaches an AI coding
   agent to read the manifest instead of re-reading the codebase, refer to things by
   stable ids (`C001`, `API-002`, `card.home.score`), and keep the manifest updated.

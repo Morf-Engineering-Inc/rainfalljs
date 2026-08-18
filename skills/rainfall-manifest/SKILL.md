@@ -21,7 +21,20 @@ The point: **read the manifest instead of the codebase.** A condensed manifest i
 
 1. Check for `rainfall.json` at the project root.
 2. If present, run `npx rainfall condense` (or read the file) **before** exploring source files. Treat its map of entities → endpoints → components as your index; only open the specific files it points you to.
-3. If absent and the task touches the data layer, offer to create one: `npx rainfall init && npx rainfall scan`, then review the proposed entries against the code (the scan is heuristic).
+3. If absent and the task touches the data layer, offer to bootstrap one (below).
+
+## Bootstrapping a manifest from scratch
+
+The scan finds the skeleton mechanically; you add the understanding. This is a one-time investment that every later session profits from.
+
+1. **Seed:** `npx rainfall init && npx rainfall scan`. Prune scan results that aren't real screen components or endpoints (helpers, tests, config).
+2. **Entities:** read the data models (DB schemas, ORM models, types for stored records) and add each as an entity — stable id (`E001`…), `name`, `source` (e.g. `dynamodb:AppTable`), and a typed `fields` map with `required` flags.
+3. **Endpoints:** open each handler and correct what the scan guessed: the real `method` (scan defaults to GET), `reads` (entities/fields queried), `writes` (entities mutated), and `returns` (response shape).
+4. **UI ids:** give every component a `uiId` per the convention below; reuse existing `testID` values where present.
+5. **Flows:** add 3–8 flows for the main user journeys as ordered typed steps (`ui:` → `api:` → `entity:` → …).
+6. **Verify:** `npx rainfall validate` must pass with no errors; then run `npx rainfall report` and show the user their tokens-saved numbers — that's the payoff made visible.
+
+If the code and your manifest draft disagree, the code is right.
 
 ## How to use it while working
 

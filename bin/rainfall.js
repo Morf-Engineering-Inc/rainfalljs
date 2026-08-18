@@ -6,6 +6,7 @@
 //   rainfall validate [file]    Check structure and referential integrity
 //   rainfall condense [file]    Print the compact AI context digest + token estimate
 //   rainfall report [dir]       Tokens-saved report: digest vs reading the source
+//   rainfall prompt             Print AI instructions for building the manifest
 
 const fs = require('fs');
 const path = require('path');
@@ -19,6 +20,7 @@ const {
 } = require('../cli/manifest');
 const { scanProject } = require('../cli/scan');
 const { buildReport, formatReport } = require('../cli/report');
+const { BOOTSTRAP_PROMPT } = require('../cli/prompt');
 
 const [, , command, ...args] = process.argv;
 const cwd = process.cwd();
@@ -117,6 +119,11 @@ switch (command) {
     break;
   }
 
+  case 'prompt': {
+    console.log(BOOTSTRAP_PROMPT);
+    break;
+  }
+
   default:
     console.log('rainfall — compact data-layer manifests for token-efficient AI development');
     console.log('');
@@ -126,5 +133,6 @@ switch (command) {
     console.log('  rainfall validate [file]    Check structure and referential integrity');
     console.log('  rainfall condense [file]    Print the compact AI context digest');
     console.log('  rainfall report [dir]       Tokens-saved report: digest vs reading the source');
+    console.log('  rainfall prompt             Print AI instructions for building the manifest');
     process.exit(command ? 1 : 0);
 }
