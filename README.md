@@ -32,6 +32,7 @@ npx @morf_engineering/rainfalljs scan       # seed it from your React/Next.js co
 npm install -D @morf_engineering/rainfalljs
 npx rainfall validate      # check structure + referential integrity
 npx rainfall condense      # print the compact AI context digest + token estimate
+npx rainfall report        # tokens-saved report: digest vs reading the source
 ```
 
 **The AI skill:** drop [`skills/rainfall-manifest/SKILL.md`](skills/rainfall-manifest/SKILL.md) into your project's `.claude/skills/rainfall-manifest/` (or hand it to any agent) and the AI will read, use, and maintain the manifest automatically.

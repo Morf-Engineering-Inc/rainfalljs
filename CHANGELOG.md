@@ -15,6 +15,9 @@ knowledge about your app's data layer flows into (and back out of) AI coding ses
   - `rainfall scan` — heuristically seed the manifest from a React/Next.js codebase
   - `rainfall validate` — structure and referential-integrity checks
   - `rainfall condense` — emit a compact AI context digest with a token estimate
+  - `rainfall report` — tokens-saved report comparing the digest against the cost
+    of reading the mapped source files (and the whole project); missing mapped
+    files are flagged as manifest drift
 - **AI agent skill** (`skills/rainfall-manifest/SKILL.md`): teaches an AI coding
   agent to read the manifest instead of re-reading the codebase, refer to things by
   stable ids (`C001`, `API-002`, `card.home.score`), and keep the manifest updated.

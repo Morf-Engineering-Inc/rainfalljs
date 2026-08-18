@@ -110,6 +110,39 @@ describe('scanProject', () => {
   });
 });
 
+describe('buildReport', () => {
+  const { buildReport } = require('../cli/report');
+  let tmpDir;
+
+  beforeAll(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rainfall-report-'));
+    fs.mkdirSync(path.join(tmpDir, 'components'), { recursive: true });
+    fs.writeFileSync(
+      path.join(tmpDir, 'components', 'ScoreCard.jsx'),
+      'export function ScoreCard() { return null; }\n'.repeat(20)
+    );
+  });
+
+  afterAll(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('compares digest tokens against mapped and project source tokens', () => {
+    const manifest = starterManifest('demo');
+    manifest.components = [
+      { id: 'C001', name: 'ScoreCard', file: 'components/ScoreCard.jsx', uiId: 'card.a.b' },
+      { id: 'C002', name: 'Ghost', file: 'components/Ghost.jsx', uiId: 'card.c.d' },
+    ];
+    const report = buildReport(manifest, tmpDir);
+    expect(report.digestTokens).toBeGreaterThan(0);
+    expect(report.mapped.files).toBe(1);
+    expect(report.mapped.tokens).toBeGreaterThan(0);
+    expect(report.mapped.missing).toEqual(['components/Ghost.jsx']);
+    expect(report.project.files).toBe(1);
+    expect(report.savings.vsMapped).toBeGreaterThan(0);
+  });
+});
+
 describe('rainfall CLI', () => {
   it('condenses the example manifest end-to-end', () => {
     const output = execFileSync(

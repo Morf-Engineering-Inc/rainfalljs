@@ -5,6 +5,7 @@
 //   rainfall scan [dir]         Scan a React/Next.js project and seed the manifest
 //   rainfall validate [file]    Check structure and referential integrity
 //   rainfall condense [file]    Print the compact AI context digest + token estimate
+//   rainfall report [dir]       Tokens-saved report: digest vs reading the source
 
 const fs = require('fs');
 const path = require('path');
@@ -17,6 +18,7 @@ const {
   estimateTokens,
 } = require('../cli/manifest');
 const { scanProject } = require('../cli/scan');
+const { buildReport, formatReport } = require('../cli/report');
 
 const [, , command, ...args] = process.argv;
 const cwd = process.cwd();
@@ -103,6 +105,18 @@ switch (command) {
     break;
   }
 
+  case 'report': {
+    try {
+      const { manifest } = loadManifest(cwd);
+      const root = path.resolve(cwd, args[0] || '.');
+      const report = buildReport(manifest, root);
+      console.log(formatReport(report, manifest.project && manifest.project.name));
+    } catch (err) {
+      fail(err.message);
+    }
+    break;
+  }
+
   default:
     console.log('rainfall — compact data-layer manifests for token-efficient AI development');
     console.log('');
@@ -111,5 +125,6 @@ switch (command) {
     console.log('  rainfall scan [dir]         Seed the manifest from a React/Next.js project');
     console.log('  rainfall validate [file]    Check structure and referential integrity');
     console.log('  rainfall condense [file]    Print the compact AI context digest');
+    console.log('  rainfall report [dir]       Tokens-saved report: digest vs reading the source');
     process.exit(command ? 1 : 0);
 }
