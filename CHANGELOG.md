@@ -21,6 +21,9 @@ knowledge about your app's data layer flows into (and back out of) AI coding ses
   - `rainfall prompt` — prints paste-ready AI instructions that walk any coding
     assistant through building and enriching the manifest (seed with scan, add
     entities/reads/writes/flows from the code, verify, keep it updated)
+  - `rainfall condense --focus <ref>` — scoped digest for large apps: just one
+    item (by id, name, path, or uiId) plus everything it touches — its
+    endpoints, their entities, sibling consumers, and related flows
 - **AI agent skill** (`skills/rainfall-manifest/SKILL.md`): teaches an AI coding
   agent to read the manifest instead of re-reading the codebase, refer to things by
   stable ids (`C001`, `API-002`, `card.home.score`), and keep the manifest updated.

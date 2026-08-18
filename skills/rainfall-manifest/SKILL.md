@@ -56,5 +56,6 @@ Fix any errors (missing ids, duplicates) and act on warnings (dangling reference
 ## Token budget rules of thumb
 
 - Prefer `rainfall condense` output over the raw JSON when assembling context (it's ~3–5× smaller).
+- On large apps (dozens of endpoints or more), don't load the whole digest: run `npx rainfall condense --focus <id|name|uiId>` to get just the item you're working on plus everything it touches — its endpoints, their entities, sibling consumers, and related flows. Rain local weather, not the whole cloud.
 - If the user asks "how does X flow through the app", answer from `flows` first; only open code if the manifest lacks the answer — and then add the missing flow entry so next time it doesn't.
 - When summarizing your work for the user, reference manifest ids so the summary stays short and unambiguous.
