@@ -1,0 +1,78 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Morf-Engineering-Inc/rainfalljs/main/schema/rainfall.schema.json",
+  "rainfall": "1.0",
+  "project": {
+    "name": "mealcoach-example",
+    "description": "Example manifest for a nutrition tracking app.",
+    "stack": ["nextjs", "dynamodb", "react-query"]
+  },
+  "entities": [
+    {
+      "id": "E001",
+      "name": "User",
+      "source": "dynamodb:AppTable",
+      "fields": {
+        "userId": { "type": "string", "required": true },
+        "email": { "type": "string", "required": true, "validation": "email" },
+        "goals": "string[]"
+      }
+    },
+    {
+      "id": "E002",
+      "name": "Meal",
+      "source": "dynamodb:AppTable",
+      "fields": {
+        "mealId": { "type": "string", "required": true },
+        "userId": { "type": "string", "required": true },
+        "name": "string",
+        "score": "number",
+        "createdAt": "datetime"
+      }
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "API-001",
+      "method": "GET",
+      "path": "/api/score",
+      "file": "pages/api/score.js",
+      "reads": ["User.goals", "Meal.score"],
+      "writes": [],
+      "returns": { "overall": "number", "week": "number", "month": "number" },
+      "components": ["C001"]
+    },
+    {
+      "id": "API-002",
+      "method": "POST",
+      "path": "/api/meals",
+      "file": "pages/api/meals.js",
+      "reads": [],
+      "writes": ["Meal"],
+      "returns": { "mealId": "string", "score": "number" },
+      "components": ["C002"]
+    }
+  ],
+  "components": [
+    {
+      "id": "C001",
+      "name": "ScoreCard",
+      "file": "components/ScoreCard.jsx",
+      "uiId": "card.home.score",
+      "apis": ["API-001"]
+    },
+    {
+      "id": "C002",
+      "name": "MealLogger",
+      "file": "components/MealLogger.jsx",
+      "uiId": "form.meal.log",
+      "apis": ["API-002"]
+    }
+  ],
+  "flows": [
+    {
+      "id": "F001",
+      "name": "log-meal",
+      "steps": ["ui:form.meal.log", "api:API-002", "entity:Meal", "api:API-001", "ui:card.home.score"]
+    }
+  ]
+}

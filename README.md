@@ -11,6 +11,33 @@ A comprehensive data integration solution for React and Next.js applications tha
 ## About the Name
 **RainfallJS**: Just as rain naturally flows from clouds down to nourish plants below, data "rains" down from your data sources to feed your React components. The name reflects our philosophy that data flow should be as natural, reliable, and effortless as rainfall - distributed exactly where it's needed without manual intervention. This project aims to be guided by principles that guide engineering like shown [here](https://react.dev/learn/thinking-in-react).
 
+## 🌧️ New Direction: Rainfall for AI — Token-Optimized Data Context
+
+Rainfall is evolving into a tool that helps **AI coding agents build web apps with far fewer tokens**. The water cycle now describes the AI knowledge loop:
+
+- **Ocean** → your codebase and database (source of truth)
+- **Evaporation** → `rainfall scan` lifts structure out of the code
+- **Cloud** → `rainfall.json`, a compact manifest of entities → APIs → components
+- **Rainfall** → `rainfall condense` rains precise, few-hundred-token context onto each AI session
+- **The cycle** → agents update the manifest as they change code, so knowledge never evaporates
+
+Instead of an AI re-reading dozens of files every session to rediscover which component calls which API (tens of thousands of tokens), it reads one condensed digest and refers to everything by stable IDs like `C001`, `API-002`, and `card.home.score`.
+
+```bash
+npx rainfall init          # create a starter rainfall.json
+npx rainfall scan          # seed it from your React/Next.js code
+npx rainfall validate      # check structure + referential integrity
+npx rainfall condense      # print the compact AI context digest + token estimate
+```
+
+**The AI skill:** drop [`skills/rainfall-manifest/SKILL.md`](skills/rainfall-manifest/SKILL.md) into your project's `.claude/skills/rainfall-manifest/` (or hand it to any agent) and the AI will read, use, and maintain the manifest automatically.
+
+See [`RECOMMENDATION.md`](RECOMMENDATION.md) for the full rationale, [`schema/rainfall.schema.json`](schema/rainfall.schema.json) for the manifest format, and [`examples/manifest/rainfall.json`](examples/manifest/rainfall.json) for a worked example.
+
+---
+
+The original React data-provider library below still works and is unchanged.
+
 ## Features
 
 - 🔄 **Automated Data Flow** - Effortlessly connect components to data sources
