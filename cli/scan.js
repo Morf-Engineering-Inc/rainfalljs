@@ -144,4 +144,9 @@ function scanProject(root) {
   };
 }
 
-module.exports = { scanProject };
+// List all source files under root (same extension/ignore rules the scanner uses).
+function walkSourceFiles(root) {
+  return walk(root);
+}
+
+module.exports = { scanProject, walkSourceFiles };
