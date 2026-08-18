@@ -5,8 +5,15 @@
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "rainfall": "bin/rainfall.js"
+  },
   "files": [
     "dist",
+    "bin",
+    "cli",
+    "schema",
+    "skills",
     "README.md"
   ],
   "scripts": {
@@ -24,7 +31,13 @@
     "provider",
     "context",
     "state",
-    "automation"
+    "automation",
+    "ai",
+    "agent",
+    "skill",
+    "token-optimization",
+    "manifest",
+    "context-engineering"
   ],
   "author": "Your Name",
   "license": "MIT",
