@@ -110,6 +110,56 @@ describe('scanProject', () => {
   });
 });
 
+describe('focusManifest', () => {
+  const { focusManifest } = require('../cli/manifest');
+
+  // Two disconnected clusters: score (E1/A1/C1) and admin (E2/A2/C2).
+  const big = {
+    rainfall: '1.0',
+    project: { name: 'big' },
+    entities: [
+      { id: 'E001', name: 'User', fields: { id: 'string' } },
+      { id: 'E002', name: 'AuditLog', fields: { id: 'string' } },
+    ],
+    endpoints: [
+      { id: 'API-001', method: 'GET', path: '/api/score', reads: ['User'], writes: [], components: ['C001'] },
+      { id: 'API-002', method: 'GET', path: '/api/audit', reads: ['AuditLog'], writes: [], components: ['C002'] },
+    ],
+    components: [
+      { id: 'C001', name: 'ScoreCard', file: 'a.jsx', uiId: 'card.home.score', apis: ['API-001'] },
+      { id: 'C002', name: 'AuditTable', file: 'b.jsx', uiId: 'table.admin.audit', apis: ['API-002'] },
+    ],
+    flows: [
+      { id: 'F001', name: 'view-score', steps: ['ui:card.home.score', 'api:API-001', 'entity:User'] },
+      { id: 'F002', name: 'view-audit', steps: ['ui:table.admin.audit', 'api:API-002', 'entity:AuditLog'] },
+    ],
+  };
+
+  it('selects only the subgraph around a component', () => {
+    const focused = focusManifest(big, 'C001');
+    expect(focused.components.map((c) => c.id)).toEqual(['C001']);
+    expect(focused.endpoints.map((e) => e.id)).toEqual(['API-001']);
+    expect(focused.entities.map((e) => e.name)).toEqual(['User']);
+    expect(focused.flows.map((f) => f.id)).toEqual(['F001']);
+  });
+
+  it('resolves entities by name and pulls in touching endpoints', () => {
+    const focused = focusManifest(big, 'AuditLog');
+    expect(focused.endpoints.map((e) => e.id)).toEqual(['API-002']);
+    expect(focused.components.map((c) => c.id)).toEqual(['C002']);
+    expect(focused.entities.map((e) => e.name)).toEqual(['AuditLog']);
+  });
+
+  it('resolves by uiId', () => {
+    const focused = focusManifest(big, 'card.home.score');
+    expect(focused.components.map((c) => c.id)).toEqual(['C001']);
+  });
+
+  it('throws on an unknown ref', () => {
+    expect(() => focusManifest(big, 'does-not-exist')).toThrow(/No manifest item matches/);
+  });
+});
+
 describe('buildReport', () => {
   const { buildReport } = require('../cli/report');
   let tmpDir;

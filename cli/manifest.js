@@ -205,6 +205,110 @@ function condenseManifest(manifest) {
   return { text, tokens: estimateTokens(text) };
 }
 
+/**
+ * Filter a manifest down to the subgraph around one item ("local weather"):
+ * the focused item plus everything it directly touches. `ref` may be an id
+ * (C001, API-001, E001, F001), an entity name, a component name, or a uiId.
+ *
+ * Expansion rules (bounded, no full-graph crawl):
+ * - focused component  → its endpoints
+ * - focused entity     → endpoints that read/write it
+ * - focused flow       → every item in its steps
+ * - every selected endpoint → its reads/writes entities and consumer components
+ * - plus any flow that references a seed item
+ */
+function focusManifest(manifest, ref) {
+  const entities = manifest.entities || [];
+  const endpoints = manifest.endpoints || [];
+  const components = manifest.components || [];
+  const flows = manifest.flows || [];
+
+  const entitySel = new Set(); // by name
+  const endpointSel = new Set(); // by id
+  const componentSel = new Set(); // by id
+  const flowSel = new Set(); // by id
+
+  // Resolve seeds.
+  const seedEntities = entities.filter((e) => e.id === ref || e.name === ref);
+  const seedEndpoints = endpoints.filter((e) => e.id === ref || e.path === ref);
+  const seedComponents = components.filter(
+    (c) => c.id === ref || c.name === ref || c.uiId === ref
+  );
+  const seedFlows = flows.filter((f) => f.id === ref || f.name === ref);
+  if (!seedEntities.length && !seedEndpoints.length && !seedComponents.length && !seedFlows.length) {
+    throw new Error(
+      `No manifest item matches "${ref}" (tried entity id/name, endpoint id/path, component id/name/uiId, flow id/name).`
+    );
+  }
+
+  seedEntities.forEach((e) => entitySel.add(e.name));
+  seedEndpoints.forEach((e) => endpointSel.add(e.id));
+  seedComponents.forEach((c) => componentSel.add(c.id));
+  seedFlows.forEach((f) => flowSel.add(f.id));
+
+  // Flow seeds pull in every step item.
+  const componentByUiId = new Map(components.filter((c) => c.uiId).map((c) => [c.uiId, c]));
+  seedFlows.forEach((f) => {
+    (f.steps || []).forEach((step) => {
+      const [kind, stepRef] = String(step).split(':');
+      if (kind === 'api') endpointSel.add(stepRef);
+      if (kind === 'entity') entitySel.add(stepRef);
+      if (kind === 'component') componentSel.add(stepRef);
+      if (kind === 'ui' && componentByUiId.has(stepRef)) {
+        componentSel.add(componentByUiId.get(stepRef).id);
+      }
+    });
+  });
+
+  // Component seeds pull in their endpoints.
+  seedComponents.forEach((c) => (c.apis || []).forEach((id) => endpointSel.add(id)));
+
+  // Entity seeds pull in endpoints touching them.
+  if (entitySel.size) {
+    endpoints.forEach((e) => {
+      const touched = (e.reads || []).concat(e.writes || []);
+      if (touched.some((name) => entitySel.has(String(name).split('.')[0]))) {
+        endpointSel.add(e.id);
+      }
+    });
+  }
+
+  // Every selected endpoint pulls in its entities and consumer components.
+  endpoints
+    .filter((e) => endpointSel.has(e.id))
+    .forEach((e) => {
+      (e.reads || []).concat(e.writes || []).forEach((name) => {
+        entitySel.add(String(name).split('.')[0]);
+      });
+      (e.components || []).forEach((cid) => componentSel.add(cid));
+    });
+
+  // Any flow that references a seed item comes along for context.
+  const seedRefs = new Set([
+    ...seedEntities.map((e) => e.name),
+    ...seedEndpoints.map((e) => e.id),
+    ...seedComponents.map((c) => c.id),
+    ...seedComponents.filter((c) => c.uiId).map((c) => c.uiId),
+  ]);
+  flows.forEach((f) => {
+    if ((f.steps || []).some((step) => seedRefs.has(String(step).split(':')[1]))) {
+      flowSel.add(f.id);
+    }
+  });
+
+  return {
+    ...manifest,
+    project: {
+      ...(manifest.project || {}),
+      description: `Focused on "${ref}" — subgraph only.`,
+    },
+    entities: entities.filter((e) => entitySel.has(e.name)),
+    endpoints: endpoints.filter((e) => endpointSel.has(e.id)),
+    components: components.filter((c) => componentSel.has(c.id)),
+    flows: flows.filter((f) => flowSel.has(f.id)),
+  };
+}
+
 function starterManifest(projectName) {
   return {
     $schema: 'https://raw.githubusercontent.com/Morf-Engineering-Inc/rainfalljs/main/schema/rainfall.schema.json',
@@ -228,5 +332,6 @@ module.exports = {
   loadManifest,
   validateManifest,
   condenseManifest,
+  focusManifest,
   starterManifest,
 };
