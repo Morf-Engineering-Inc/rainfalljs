@@ -37,6 +37,14 @@ npx rainfall report        # tokens-saved report: digest vs reading the source
 
 **The AI skill:** drop [`skills/rainfall-manifest/SKILL.md`](skills/rainfall-manifest/SKILL.md) into your project's `.claude/skills/rainfall-manifest/` (or hand it to any agent) and the AI will read, use, and maintain the manifest automatically.
 
+**Let your AI build the manifest for you:** the scan only finds the skeleton — entities, read/write mappings, response shapes, and flows need code understanding, which is an AI's job. If your agent has the skill installed, just ask it to "bootstrap a rainfall manifest". Otherwise run:
+
+```bash
+npx @morf_engineering/rainfalljs prompt
+```
+
+and paste the printed instructions into Claude, Cursor, or any coding assistant. The AI will seed the manifest with `scan`, enrich it by reading your models and handlers, verify it with `validate`, and finish by showing you your own `report` numbers — plus a standing instruction to keep the manifest updated from then on.
+
 See [`RECOMMENDATION.md`](RECOMMENDATION.md) for the full rationale, [`schema/rainfall.schema.json`](schema/rainfall.schema.json) for the manifest format, and [`examples/manifest/rainfall.json`](examples/manifest/rainfall.json) for a worked example.
 
 ---
