@@ -24,8 +24,12 @@ Rainfall is evolving into a tool that helps **AI coding agents build web apps wi
 Instead of an AI re-reading dozens of files every session to rediscover which component calls which API (tens of thousands of tokens), it reads one condensed digest and refers to everything by stable IDs like `C001`, `API-002`, and `card.home.score`.
 
 ```bash
-npx rainfall init          # create a starter rainfall.json
-npx rainfall scan          # seed it from your React/Next.js code
+# One-off, no install needed:
+npx @morf_engineering/rainfalljs init       # create a starter rainfall.json
+npx @morf_engineering/rainfalljs scan       # seed it from your React/Next.js code
+
+# Or install it, then use the short command:
+npm install -D @morf_engineering/rainfalljs
 npx rainfall validate      # check structure + referential integrity
 npx rainfall condense      # print the compact AI context digest + token estimate
 ```
