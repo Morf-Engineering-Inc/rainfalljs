@@ -22,10 +22,25 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      # Trusted Publishing needs npm >= 11.5.1. Node 24 ships npm 11, but printing
+      # it makes the next failure readable instead of guesswork.
+      - name: npm version
+        run: npm --version
+
       - name: Publish
-        # Auth resolution: npm uses Trusted Publishing (OIDC) when this repo +
-        # workflow is configured as a trusted publisher on npmjs.com; otherwise
-        # it falls back to the NPM_TOKEN secret if one is set.
+        # NO `env: NODE_AUTH_TOKEN` here, deliberately.
+        #
+        # setup-node's `registry-url` writes an .npmrc containing
+        # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`. When the secret
+        # does not exist that expands to an EMPTY token, and npm then treats auth
+        # as already configured: it takes the token path, fails ENEEDAUTH, and
+        # never attempts the OIDC exchange. The v0.3.0 release failed twice this
+        # way, with no mention of OIDC anywhere in the log.
+        #
+        # So the "fallback" was not a fallback. It was the thing stopping Trusted
+        # Publishing from being tried. With no token present, npm performs the
+        # OIDC exchange using the `id-token: write` permission declared above.
+        #
+        # If a token is ever needed again, add it back as a separate step guarded
+        # by `if: secrets.NPM_TOKEN != ''` rather than as an always-empty env.
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
