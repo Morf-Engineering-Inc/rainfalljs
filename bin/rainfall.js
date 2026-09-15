@@ -7,7 +7,8 @@
 //   rainfall condense [file] [--focus <ref>]
 //                               Print the compact AI context digest + token estimate;
 //                               --focus limits it to one item's subgraph
-//   rainfall report [dir]       Tokens-saved report: digest vs reading the source
+//   rainfall report [dir] [--json]
+//                               Tokens-saved report: digest vs reading the source
 //   rainfall components [--json] List UI component shapes and their data contracts
 //   rainfall prompt             Print AI instructions for building the manifest
 
@@ -133,8 +134,29 @@ switch (command) {
   case 'report': {
     try {
       const { manifest } = loadManifest(cwd);
-      const root = path.resolve(cwd, args[0] || '.');
+      // Ignore flags when picking the directory: `report --json` was resolving
+      // the root to a folder literally named "--json", so every file came back
+      // missing and every number came back zero.
+      const dirArg = args.find((a) => !a.startsWith('-'));
+      const root = path.resolve(cwd, dirArg || '.');
       const report = buildReport(manifest, root);
+      if (args.includes('--json')) {
+        // Structured output so a CI job can compare committed numbers against
+        // live ones without scraping formatted text. TOKENS.md drifted once
+        // precisely because re-checking it by hand was nobody's job.
+        console.log(
+          JSON.stringify(
+            {
+              projectName: (manifest.project && manifest.project.name) || null,
+              tokenEstimator: 'bytes/4',
+              ...report,
+            },
+            null,
+            2,
+          ),
+        );
+        break;
+      }
       console.log(formatReport(report, manifest.project && manifest.project.name));
     } catch (err) {
       fail(err.message);
@@ -180,7 +202,9 @@ switch (command) {
     console.log('  rainfall condense [file] [--focus <ref>]');
     console.log('                              Print the compact AI context digest; --focus <id|name|uiId>');
     console.log('                              limits it to one item and everything it touches');
-    console.log('  rainfall report [dir]       Tokens-saved report: digest vs reading the source');
+    console.log('  rainfall report [dir] [--json]');
+    console.log('                              Tokens-saved report: digest vs reading the');
+    console.log('                              source; --json for machine-readable output');
     console.log('  rainfall components [--json]');
     console.log('                              List UI component shapes: what data each accepts');
     console.log('                              and what props it produces (language-agnostic)');

@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.4.0 — 2026-09-15
+
+### Added
+
+- **`rainfall report --json`** — the structured report, so a build can compare
+  committed numbers against live ones instead of scraping formatted text.
+  `buildReport()` already returned the right shape internally; it was simply
+  never exposed.
+- **The demo numbers are now a test.** `__tests__/demo-numbers.test.js` runs the
+  report against `examples/fintech-demo` and fails if `TOKENS.md` or the README
+  quote figures the tool no longer produces. Verified by breaking TOKENS.md on
+  purpose and watching it fail.
+
+  This closes the gap that let TOKENS.md sit at 19 files / ~4977 tokens / 6.9x
+  while the truth was 17 / ~3699 / 5.1x. A package whose argument is
+  "documentation that fails the build when it stops being true" should not need
+  a human to notice.
+
+### Fixed
+
+- **`report` mis-parsed its directory argument.** It took `args[0]` as the root,
+  so `report --json` resolved the root to a folder named `--json`: every mapped
+  file came back missing and every number came back zero. Flags are now skipped
+  when picking the directory.
+
+### Note
+
+`tokenEstimator: "bytes/4"` is stated explicitly in the JSON output. Token counts
+are `bytes ÷ 4`, a prose heuristic that runs low for source code — see #52.
+
 ## 0.3.2 — 2026-09-15
 
 Documentation only. Publishes what 0.3.1 did not.
