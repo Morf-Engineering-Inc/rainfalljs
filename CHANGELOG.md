@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.1 — 2026-09-15
+
+Documentation only. No code change.
+
+- **Badges fixed.** The pre-0.3.0 README carried a "Build Status" badge pointing at
+  `github.com/morf_engineering/rainfalljs` — the wrong organisation, so it had been a
+  broken image for the life of the package. It is gone, and the four that remain are
+  verified to resolve: Tests, npm version, npm downloads, MIT.
+- **Added a `dependencies-0` badge.** It is the shortest true thing about this package
+  and worth stating on the tin.
+- Republished so npmjs.com serves the current README. npm renders the README from the
+  published tarball, so a docs change only reaches that page on a publish — which is
+  why this is a version bump rather than a commit.
+
 ## 0.3.0 — 2026-09-15
 
 **Breaking: the React runtime is removed.** The manifest tool is the package.
