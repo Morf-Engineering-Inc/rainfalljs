@@ -48,3 +48,8 @@ temp/
 # The pre-Data-Map prototype. Superseded by src/datamap/ — kept on disk as the
 # source it was grown from, deliberately not published.
 rainfall_generalize/
+
+# Re-added by a rebase on 2026-09-15 and removed again. See CHANGELOG 0.3.0:
+# two manifest files, no source, a 297-entry lockfile, and most of the
+# vulnerability alerts GitHub reported against this repo.
+react-data-provider/
