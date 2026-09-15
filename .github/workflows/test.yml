@@ -11,12 +11,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-
+    - uses: actions/checkout@v5
     - name: Use Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
-        node-version: '20.x'
+        node-version: '24.x'
         cache: 'npm'
 
     # `npm ci` only. The previous version ran `npm install` first, which can
@@ -34,3 +33,5 @@ jobs:
     # emitted a file the entry point did not import.
     - name: Build and test
       run: npm test
+    - name: Build
+      run: npm run build

@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/Morf-Engineering-Inc/rainfalljs/main/schema/rainfall.schema.json",
+  "title": "Rainfall Manifest",
+  "description": "A compact, machine-readable map of a web app's data layer: entities (the ocean), endpoints (evaporation), components (rainfall), and flows (the full cycle). Designed to be condensed into a few hundred tokens of AI context.",
+  "type": "object",
+  "required": ["rainfall", "project"],
+  "properties": {
+    "rainfall": {
+      "type": "string",
+      "description": "Manifest format version.",
+      "examples": ["1.0"]
+    },
+    "project": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "stack": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tech stack labels, e.g. [\"nextjs\", \"dynamodb\", \"react-native\"]."
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "description": "The ocean: your data's source of truth (database tables/models).",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string", "description": "Stable unique id, e.g. \"E001\"." },
+          "name": { "type": "string", "description": "Entity name, e.g. \"User\"." },
+          "source": { "type": "string", "description": "Where it lives, e.g. \"dynamodb:AppTable\" or \"postgres:users\"." },
+          "fields": {
+            "description": "Field map. Values are a type string or an object with type/required/validation.",
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string" },
+                    "required": { "type": "boolean" },
+                    "validation": { "type": "string" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "endpoints": {
+      "type": "array",
+      "description": "Evaporation: APIs that lift data out of the ocean and carry it toward the UI.",
+      "items": {
+        "type": "object",
+        "required": ["id", "method", "path"],
+        "properties": {
+          "id": { "type": "string", "description": "Stable unique id, e.g. \"API-001\"." },
+          "method": { "type": "string", "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"] },
+          "path": { "type": "string", "examples": ["/api/meals", "/api/users/{userId}"] },
+          "file": { "type": "string", "description": "Handler source file, if known." },
+          "reads": { "type": "array", "items": { "type": "string" }, "description": "Entity names (or Entity.field) this endpoint reads." },
+          "writes": { "type": "array", "items": { "type": "string" }, "description": "Entity names this endpoint writes." },
+          "returns": { "type": "object", "description": "Response shape as a field map." },
+          "components": { "type": "array", "items": { "type": "string" }, "description": "Component ids that consume this endpoint." }
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "description": "Rainfall: UI components where the data finally lands.",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string", "description": "Stable unique id, e.g. \"C001\"." },
+          "name": { "type": "string" },
+          "file": { "type": "string", "description": "Source file path relative to the project root." },
+          "uiId": {
+            "type": "string",
+            "description": "Stable hierarchical UI id: <element>.<screen>.<purpose>[.variant], e.g. \"card.home.score\". Doubles as testID and analytics id.",
+            "pattern": "^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$"
+          },
+          "apis": { "type": "array", "items": { "type": "string" }, "description": "Endpoint ids this component consumes." }
+        }
+      }
+    },
+    "flows": {
+      "type": "array",
+      "description": "The full cycle: named end-to-end paths through UI, API, and data.",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "steps"],
+        "properties": {
+          "id": { "type": "string", "description": "Stable unique id, e.g. \"F001\"." },
+          "name": { "type": "string", "examples": ["log-meal", "checkout"] },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Typed reference: \"ui:<uiId>\", \"component:<id>\", \"api:<id>\", or \"entity:<name>\".",
+              "pattern": "^(ui|component|api|entity):.+$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

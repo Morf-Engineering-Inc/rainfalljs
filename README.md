@@ -24,6 +24,46 @@ validates in CI and prints itself small enough to paste into a prompt.
 do not already have a data layer.
 
 They do not depend on each other. Most teams want the first one.
+## 🌧️ New Direction: Rainfall for AI — Token-Optimized Data Context
+
+Rainfall is evolving into a tool that helps **AI coding agents build web apps with far fewer tokens**. The water cycle now describes the AI knowledge loop:
+
+- **Ocean** → your codebase and database (source of truth)
+- **Evaporation** → `rainfall scan` lifts structure out of the code
+- **Cloud** → `rainfall.json`, a compact manifest of entities → APIs → components
+- **Rainfall** → `rainfall condense` rains precise, few-hundred-token context onto each AI session
+- **The cycle** → agents update the manifest as they change code, so knowledge never evaporates
+
+Instead of an AI re-reading dozens of files every session to rediscover which component calls which API (tens of thousands of tokens), it reads one condensed digest and refers to everything by stable IDs like `C001`, `API-002`, and `card.home.score`.
+
+```bash
+# One-off, no install needed:
+npx @morf_engineering/rainfalljs init       # create a starter rainfall.json
+npx @morf_engineering/rainfalljs scan       # seed it from your React/Next.js code
+
+# Or install it, then use the short command:
+npm install -D @morf_engineering/rainfalljs
+npx rainfall validate      # check structure + referential integrity
+npx rainfall condense      # print the compact AI context digest + token estimate
+npx rainfall condense --focus card.home.score   # just one item's subgraph (for large apps)
+npx rainfall report        # tokens-saved report: digest vs reading the source
+```
+
+**The AI skill:** drop [`skills/rainfall-manifest/SKILL.md`](skills/rainfall-manifest/SKILL.md) into your project's `.claude/skills/rainfall-manifest/` (or hand it to any agent) and the AI will read, use, and maintain the manifest automatically.
+
+**Let your AI build the manifest for you:** the scan only finds the skeleton — entities, read/write mappings, response shapes, and flows need code understanding, which is an AI's job. If your agent has the skill installed, just ask it to "bootstrap a rainfall manifest". Otherwise run:
+
+```bash
+npx @morf_engineering/rainfalljs prompt
+```
+
+and paste the printed instructions into Claude, Cursor, or any coding assistant. The AI will seed the manifest with `scan`, enrich it by reading your models and handlers, verify it with `validate`, and finish by showing you your own `report` numbers — plus a standing instruction to keep the manifest updated from then on.
+
+See [`RECOMMENDATION.md`](RECOMMENDATION.md) for the full rationale, [`schema/rainfall.schema.json`](schema/rainfall.schema.json) for the manifest format, and [`examples/manifest/rainfall.json`](examples/manifest/rainfall.json) for a worked example.
+
+---
+
+The original React data-provider library below still works and is unchanged.
 
 ## Features
 

@@ -3,19 +3,29 @@ name: Publish Package to NPM
 on:
   release:
     types: [created]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # required for npm Trusted Publishing (OIDC) and provenance
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: '16.x'
+          # Node 24 bundles npm 11+, required for npm Trusted Publishing.
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm test
       - run: npm run build
-      - run: npm publish --access public
+      - name: Publish
+        # Auth resolution: npm uses Trusted Publishing (OIDC) when this repo +
+        # workflow is configured as a trusted publisher on npmjs.com; otherwise
+        # it falls back to the NPM_TOKEN secret if one is set.
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
