@@ -270,6 +270,11 @@ release, so this is unlikely — pin `0.2.0` or move to React Query.
 The component mapper survives, rewritten without React: `/mapper`, pure functions,
 described by a JSON catalogue any language can read.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) — setup, layout, the testing rule, and how a
+release is cut.
+
 ## License
 
 MIT
