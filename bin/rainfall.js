@@ -8,6 +8,7 @@
 //                               Print the compact AI context digest + token estimate;
 //                               --focus limits it to one item's subgraph
 //   rainfall report [dir]       Tokens-saved report: digest vs reading the source
+//   rainfall components [--json] List UI component shapes and their data contracts
 //   rainfall prompt             Print AI instructions for building the manifest
 
 const fs = require('fs');
@@ -141,6 +142,29 @@ switch (command) {
     break;
   }
 
+  case 'components': {
+    // The catalogue is JSON on disk, not a JS export, so a Swift, Python,
+    // Kotlin or Flutter frontend can read the same contract this CLI prints.
+    const cat = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '..', 'schema', 'components.json'), 'utf8'),
+    );
+    if (args.includes('--json')) {
+      console.log(JSON.stringify(cat, null, 2));
+      break;
+    }
+    const w = Math.max(...cat.shapes.map((s) => s.type.length));
+    console.log(`RAINFALL COMPONENTS v${cat.rainfallComponents} \u2014 ${cat.shapes.length} shapes\n`);
+    for (const s of cat.shapes) {
+      console.log(`${s.type.padEnd(w)}  ${s.purpose}`);
+      console.log(`${' '.repeat(w)}  in : ${s.accepts}`);
+      console.log(`${' '.repeat(w)}  out: ${s.produces}`);
+      if (s.options.length) console.log(`${' '.repeat(w)}  opt: ${s.options.join(', ')}`);
+      console.log('');
+    }
+    console.log('--json for the machine-readable catalogue.');
+    break;
+  }
+
   case 'prompt': {
     console.log(BOOTSTRAP_PROMPT);
     break;
@@ -157,6 +181,9 @@ switch (command) {
     console.log('                              Print the compact AI context digest; --focus <id|name|uiId>');
     console.log('                              limits it to one item and everything it touches');
     console.log('  rainfall report [dir]       Tokens-saved report: digest vs reading the source');
+    console.log('  rainfall components [--json]');
+    console.log('                              List UI component shapes: what data each accepts');
+    console.log('                              and what props it produces (language-agnostic)');
     console.log('  rainfall prompt             Print AI instructions for building the manifest');
     process.exit(command ? 1 : 0);
 }

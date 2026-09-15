@@ -8,11 +8,11 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "dist/datamap",
-    "rootDir": "src/datamap",
+    "outDir": "dist",
+    "rootDir": "src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["src/datamap/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

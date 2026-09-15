@@ -1,0 +1,124 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Morf-Engineering-Inc/rainfalljs/main/schema/components.schema.json",
+  "rainfallComponents": "1.0",
+  "description": "Component shapes: what each UI component type accepts as data and produces as props. Language-agnostic — the JS mappings in @morf_engineering/rainfalljs/mapper implement these, but any frontend in any language can read this file and implement them natively.",
+  "shapes": [
+    {
+      "type": "Select",
+      "purpose": "Choose one of many — select, dropdown, radio group, autocomplete",
+      "accepts": "Row[] — an array of records",
+      "produces": "{ items: { value, label }[] }",
+      "options": [
+        "valueField",
+        "labelField"
+      ]
+    },
+    {
+      "type": "Table",
+      "purpose": "Rows and columns — table, data grid, spreadsheet",
+      "accepts": "Row[] — columns are derived from the first row unless given",
+      "produces": "{ columns: { id, header }[], rows: Row[] }",
+      "options": [
+        "columns",
+        "headers"
+      ]
+    },
+    {
+      "type": "List",
+      "purpose": "An ordered run of items — list, menu, nav",
+      "accepts": "Row[]",
+      "produces": "{ items: { value, label, description? }[] }",
+      "options": [
+        "valueField",
+        "labelField",
+        "descriptionField"
+      ]
+    },
+    {
+      "type": "Card",
+      "purpose": "One record shown on its own",
+      "accepts": "Row — a single object",
+      "produces": "{ title, description, body }",
+      "options": [
+        "labelField",
+        "descriptionField",
+        "defaultTitle"
+      ]
+    },
+    {
+      "type": "Tabs",
+      "purpose": "Parallel panels, one visible at a time",
+      "accepts": "Row[] — one tab per row",
+      "produces": "{ tabs: { value, label, content }[], defaultValue }",
+      "options": [
+        "valueField",
+        "labelField",
+        "contentField"
+      ]
+    },
+    {
+      "type": "Timeline",
+      "purpose": "Events in time order",
+      "accepts": "Row[] — each needs a date field",
+      "produces": "{ events: { at, label, description? }[] } — sorted ascending",
+      "options": [
+        "dateField",
+        "labelField",
+        "descriptionField"
+      ]
+    },
+    {
+      "type": "Chart",
+      "purpose": "A plotted series — line, bar, area",
+      "accepts": "Row[] — one x field, one or more y fields",
+      "produces": "{ series: { name, points: { x, y }[] }[] }",
+      "options": [
+        "xField",
+        "yFields"
+      ]
+    },
+    {
+      "type": "Stat",
+      "purpose": "One number with its label — KPI tile, badge, meter",
+      "accepts": "Row or number",
+      "produces": "{ label, value, delta?, unit? }",
+      "options": [
+        "valueField",
+        "labelField",
+        "deltaField",
+        "unit"
+      ]
+    },
+    {
+      "type": "KeyValue",
+      "purpose": "Field-by-field detail — definition list, property panel",
+      "accepts": "Row — rendered key by key",
+      "produces": "{ pairs: { key, label, value }[] }",
+      "options": [
+        "headers",
+        "columns"
+      ]
+    },
+    {
+      "type": "Tree",
+      "purpose": "Nested structure — tree view, file browser, org chart",
+      "accepts": "Row[] — flat rows joined by a parent field",
+      "produces": "{ nodes: { value, label, children }[] } — roots only",
+      "options": [
+        "valueField",
+        "labelField",
+        "parentField"
+      ]
+    },
+    {
+      "type": "Form",
+      "purpose": "Editable fields for one record",
+      "accepts": "Row — the current values",
+      "produces": "{ fields: { name, label, value, type }[] }",
+      "options": [
+        "headers",
+        "columns"
+      ]
+    }
+  ]
+}
