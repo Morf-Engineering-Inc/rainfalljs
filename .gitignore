@@ -40,3 +40,11 @@ coverage/
 # Temporary files
 tmp/
 temp/
+# Local archives and scratch material. This repo is public: a zip swept in by a
+# stray `git add` is republished to everyone and stays in history after deletion.
+*.zip
+*.tar.gz
+
+# The pre-Data-Map prototype. Superseded by src/datamap/ — kept on disk as the
+# source it was grown from, deliberately not published.
+rainfall_generalize/
