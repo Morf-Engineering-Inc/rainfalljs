@@ -1,6 +1,6 @@
 // next-data-provider.js - Next.js specific integration
 import { useRouter } from 'next/router';
-import { DataProvider, createDataSource } from './data-provider';
+import { DataProvider, createDataSource } from '../core/react-data-provider';
 
 /**
  * NextDataProvider - Enhanced DataProvider for Next.js
