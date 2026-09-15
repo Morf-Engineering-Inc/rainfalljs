@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Morf-Engineering-Inc/rainfalljs/main/assets/logo.png"
+       alt="RainfallJS" width="150">
+</p>
+
 # RainfallJS
 
 [![Tests](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml/badge.svg)](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml)
