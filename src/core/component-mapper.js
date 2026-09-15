@@ -1,6 +1,6 @@
 // src/core/component-mapper.js
 import React from 'react';
-import { useData } from './data-provider';
+import { useData } from './react-data-provider';
 
 /**
  * A registry of component prop mappings

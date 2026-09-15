@@ -1,28 +1,23 @@
 {
   "name": "@morf_engineering/rainfalljs",
   "version": "0.2.0",
-  "description": "Automated, secure and reliable data integration for React and Next.js components",
+  "description": "The Data Map: one declaration of how data flows from business requirement to endpoint to screen \u2014 plus a React/Next data provider.",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "rainfall": "bin/rainfall.js"
-  },
+  "module": "dist/esm/index.js",
   "files": [
     "dist",
-    "bin",
-    "cli",
-    "schema",
-    "skills",
-    "README.md"
+    "README.md",
+    "docs/DATA-MAP.md"
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && npm run build:cjs && npm run build:esm",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:datamap",
     "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir dist --extensions '.js,.jsx'",
     "build:esm": "cross-env BABEL_ENV=esm babel src --out-dir dist/esm --extensions '.js,.jsx'",
     "prepublishOnly": "npm run build",
-    "test": "npm run build && jest"
+    "test": "npm run build && jest",
+    "build:datamap": "tsc -p tsconfig.datamap.json",
+    "typecheck": "tsc -p tsconfig.datamap.json --noEmit"
   },
   "keywords": [
     "react",
@@ -30,16 +25,15 @@
     "data",
     "provider",
     "context",
-    "state",
-    "automation",
-    "ai",
-    "agent",
-    "skill",
-    "token-optimization",
-    "manifest",
-    "context-engineering"
+    "data-map",
+    "api-contract",
+    "access-patterns",
+    "requirements-traceability",
+    "documentation",
+    "llm",
+    "ai-agents"
   ],
-  "author": "Morf Engineering Inc",
+  "author": "Morf Engineering Inc.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -80,6 +74,23 @@
     "rimraf": "^6.0.1",
     "rollup": "^2.79.2",
     "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-terser": "^7.0.2"
+    "rollup-plugin-terser": "^7.0.2",
+    "typescript": "^4.9.5"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/index.js"
+    },
+    "./next": {
+      "require": "./dist/next/next-data-provider.js",
+      "import": "./dist/esm/next/next-data-provider.js"
+    },
+    "./datamap": {
+      "types": "./dist/datamap/index.d.ts",
+      "require": "./dist/datamap/index.js",
+      "import": "./dist/datamap/index.js"
+    },
+    "./package.json": "./package.json"
   }
 }
