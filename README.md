@@ -4,11 +4,28 @@
 [![npm version](https://img.shields.io/npm/v/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**A compact, validated map of your app's data layer — so an AI agent can change your
-code without reading all of it.**
+**One map of your data layer — front end, middle, back end — that your build keeps
+honest.**
 
-Entities, endpoints, components, screens, and the business requirements they serve, in
-one file your build checks.
+Entities, endpoints, the component hierarchy that renders them, the screens they land
+on, and the business requirements they serve. One file. Checked in CI.
+
+It is the linchpin that keeps the front end and the back end locked together while both
+change: rename a field and the map says which components break; add a screen and it says
+which endpoint nothing serves. And because it is small and typed, an AI agent reads the
+whole data layer in a few hundred tokens instead of rediscovering it file by file, every
+session.
+
+```
+      ocean        your database and code — the source of truth
+        ↓ evaporation      rainfall scan lifts the structure out
+      cloud        rainfall.json — entities → endpoints → components → screens
+        ↓ rainfall         rainfall condense rains precise context into a session
+      ground       the agent changes code, and updates the map as it goes
+        ↺ the cycle        validate fails the build if the two ever part
+```
+
+Nothing evaporates. That is the whole trick.
 
 ---
 
@@ -179,8 +196,23 @@ const map = defineDataMap({
 
 map.consumersOf('INV');   // what breaks if I change this endpoint
 map.trace('BR-1');        // requirement → endpoints → screens → components
-validate(map);            // dangling refs and state conflicts are errors
+map.subtreeOf('Page');    // a component and everything it renders
+map.parentOf('Row');      // what renders this one
+validate(map);            // dangling refs, render cycles and state conflicts are errors
 brief(map);               // the digest
+```
+
+Components nest via `children`, so the map matches how a UI is actually built. A screen
+names its top-level components; those name theirs. `endpointsFor(screen)` then resolves
+an endpoint fetched four levels down without the screen restating it, and `brief` prints
+the tree:
+
+```
+S1       /dash  Dashboard
+         Page
+           └ Panel
+             └ Row  ←E2
+         endpoints:  E2
 ```
 
 It adds two layers the manifest does not yet carry: **business requirements** (what the

@@ -78,6 +78,19 @@ export function validate(map: DataMap): Finding[] {
 		}
 	}
 
+	for (const component of map.components) {
+		for (const id of component.children ?? []) {
+			if (!map.component(id)) {
+				add(
+					"error",
+					"unknown-component",
+					`component:${component.id}`,
+					`renders child "${id}", which is not declared.`,
+				);
+			}
+		}
+	}
+
 	for (const screen of map.screens) {
 		for (const id of screen.components ?? []) {
 			if (!map.component(id)) {
@@ -146,9 +159,13 @@ export function validate(map: DataMap): Finding[] {
 		}
 	}
 
+	// A component is "held" if a screen names it OR another component renders it.
+	// Without the second half, every nested child reads as an orphan.
 	const held = new Set<string>();
 	for (const screen of map.screens)
 		for (const id of screen.components ?? []) held.add(id);
+	for (const component of map.components)
+		for (const id of component.children ?? []) held.add(id);
 	for (const component of map.components) {
 		if (!held.has(component.id) && !unbuilt(component.state)) {
 			add(
@@ -206,6 +223,31 @@ export function validate(map: DataMap): Finding[] {
 				);
 			}
 		}
+	}
+
+	// ── Render cycles ─────────────────────────────────────────────────────────
+	// A component cannot contain itself. Unlike a context cycle this one hangs a
+	// renderer rather than failing to mount, so it is worth its own check.
+	{
+		const colour = new Map<string, 0 | 1 | 2>();
+		const walk = (id: string, path: string[]): void => {
+			if (colour.get(id) === 2) return;
+			if (colour.get(id) === 1) {
+				add(
+					"error",
+					"child-cycle",
+					`component:${id}`,
+					`render cycle: ${[...path, id].join(" → ")}.`,
+				);
+				return;
+			}
+			colour.set(id, 1);
+			for (const child of map.component(id)?.children ?? []) {
+				if (map.component(child)) walk(child, [...path, id]);
+			}
+			colour.set(id, 2);
+		};
+		for (const component of map.components) walk(component.id, []);
 	}
 
 	// ── Provider cycles ───────────────────────────────────────────────────────

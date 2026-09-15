@@ -85,14 +85,27 @@ export function brief(map: DataMap): string {
 	}
 
 	if (map.screens.length) {
-		out.push("", "SCREENS  id route · components · endpoints reached");
+		out.push("", "SCREENS  id route · component tree · endpoints reached");
 		for (const s of map.screens) {
 			out.push(
 				`${pad(s.id, 8)}${mark(s.state)} ${s.route ?? ""}  ${s.name}`,
 			);
-			out.push(
-				`         components: ${(s.components ?? []).join(" ") || "—"}`,
-			);
+			// The tree, not a flat list: indentation IS the front-end hierarchy.
+			const seen = new Set<string>();
+			const limb = (id: string, depth: number): void => {
+				if (seen.has(id)) return;
+				seen.add(id);
+				const c = map.component(id);
+				if (!c) return;
+				const needs = (c.needs ?? []).map((n) => n.endpoint).join(",");
+				out.push(
+					`         ${"  ".repeat(depth)}${depth ? "└ " : ""}${c.id}${mark(c.state)}` +
+						(needs ? `  ←${needs}` : ""),
+				);
+				for (const child of c.children ?? []) limb(child, depth + 1);
+			};
+			for (const id of s.components ?? []) limb(id, 0);
+			if (!(s.components ?? []).length) out.push("         (no components)");
 			out.push(
 				`         endpoints:  ${
 					map.endpointsFor(s.id).map((e) => e.id).join(" ") || "—"
@@ -114,6 +127,7 @@ export function brief(map: DataMap): string {
 				`${pad(c.id, 8)}${mark(c.state)} ${c.name}${c.file ? `  (${c.file})` : ""}`,
 			);
 			if (needs) out.push(`         needs: ${needs}`);
+			if (c.children?.length) out.push(`         renders: ${c.children.join(" ")}`);
 			if (c.computed?.length)
 				out.push(`         computed: ${c.computed.join(" ")}`);
 			if (c.context?.length) out.push(`         context: ${c.context.join(" ")}`);

@@ -49,8 +49,14 @@ export interface DataMap {
 	 * This is the function that makes `Screen` have no endpoint list of its own.
 	 */
 	endpointsFor(screenId: string): Endpoint[];
-	/** The components a screen holds, in the order the screen names them. */
+	/**
+	 * Every component a screen renders, nested children included, depth-first.
+	 */
 	componentsFor(screenId: string): Component[];
+	/** One component and everything it renders, itself first. */
+	subtreeOf(componentId: string): Component[];
+	/** The component that renders this one, if any. */
+	parentOf(componentId: string): Component | undefined;
 	/** Every component that needs this endpoint — the "what breaks if I change it" read. */
 	consumersOf(endpointId: string): Component[];
 	/** Every screen that reaches this endpoint through any of its components. */
@@ -83,13 +89,40 @@ export function defineDataMap(input: DataMapInput): DataMap {
 	const byComponent = index(components);
 	const byScreen = index(screens);
 
+	/**
+	 * A component and everything it renders, depth-first, each once.
+	 * Guards against a cycle so a malformed map still returns rather than hangs;
+	 * validate() reports the cycle itself.
+	 */
+	const descend = (id: string, seen: Set<string>, out: Component[]): void => {
+		if (seen.has(id)) return;
+		seen.add(id);
+		const component = byComponent.get(id);
+		if (!component) return;
+		out.push(component);
+		for (const child of component.children ?? []) descend(child, seen, out);
+	};
+
+	/** Every component on a screen, including nested children, in render order. */
 	const componentsFor = (screenId: string): Component[] => {
 		const screen = byScreen.get(screenId);
 		if (!screen?.components) return [];
-		return screen.components
-			.map((id) => byComponent.get(id))
-			.filter((c): c is Component => Boolean(c));
+		const out: Component[] = [];
+		const seen = new Set<string>();
+		for (const id of screen.components) descend(id, seen, out);
+		return out;
 	};
+
+	/** The component tree under one component, itself first. */
+	const subtreeOf = (componentId: string): Component[] => {
+		const out: Component[] = [];
+		descend(componentId, new Set(), out);
+		return out;
+	};
+
+	/** The component that renders this one, if any. */
+	const parentOf = (componentId: string): Component | undefined =>
+		components.find((c) => (c.children ?? []).includes(componentId));
 
 	const endpointsFor = (screenId: string): Endpoint[] => {
 		const screen = byScreen.get(screenId);
@@ -176,6 +209,8 @@ export function defineDataMap(input: DataMapInput): DataMap {
 		screen: (id) => byScreen.get(id),
 		endpointsFor,
 		componentsFor,
+		subtreeOf,
+		parentOf,
 		consumersOf,
 		screensUsing,
 		requirementsFor,

@@ -81,6 +81,16 @@ export interface Component {
 	/** Repo-relative path. Lets a reader jump from the map to the code. */
 	file?: string;
 	needs?: DataNeed[];
+	/**
+	 * Components rendered inside this one, by id — the front-end hierarchy.
+	 *
+	 * A screen names its top-level components; those name theirs. The tree is
+	 * what makes the map match how a UI is actually built, and it is why
+	 * `endpointsFor(screen)` can resolve an endpoint fetched four levels down
+	 * without the screen restating it. A cycle here is an error: a component
+	 * cannot contain itself, directly or otherwise.
+	 */
+	children?: string[];
 	/** Providers it must sit inside. */
 	context?: string[];
 	/** Derived on read from data it already has — never fetched, never stored. */
@@ -163,4 +173,5 @@ export type FindingCode =
 	| "unrequired-endpoint"
 	| "missing-fallback"
 	| "state-conflict"
-	| "context-cycle";
+	| "context-cycle"
+	| "child-cycle";
