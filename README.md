@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Morf-Engineering-Inc/rainfalljs/main/assets/logo.png"
+       alt="RainfallJS" width="150">
+</p>
+
 # RainfallJS
 
 [![Tests](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml/badge.svg)](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml)
@@ -280,6 +285,138 @@ different kind of object from one that does not.
 
 See [`RECOMMENDATION.md`](RECOMMENDATION.md) for the rationale and
 [`schema/rainfall.schema.json`](schema/rainfall.schema.json) for the manifest format.
+
+---
+
+## The worked demo — real numbers you can re-run
+
+[`examples/fintech-demo/`](examples/fintech-demo/) is a complete Next.js finance app —
+accounts, transactions, budgets, net worth, insights — with a `rainfall.json` describing
+it. It exists so the token claim is a measurement rather than a promise.
+
+[`TOKENS.md`](examples/fintech-demo/TOKENS.md) is the output of `rainfall report` against
+those files, not an estimate:
+
+```
+Condensed digest:            ~726 tokens   (what an AI reads instead)
+Mapped source files:         ~3631 tokens  (16 files the manifest describes)
+All project source files:    ~3699 tokens  (17 files, blind-exploration ceiling)
+
+Savings vs reading mapped files:   5.0x fewer tokens per session
+Savings vs exploring the project:  5.1x fewer tokens per session
+```
+
+Scoped to one work item — everything an agent needs to change the add-transaction form
+and nothing else:
+
+```
+~233 tokens focused on "form.transactions.add"   (full digest: ~726)
+```
+
+Roughly **16x** less than reading the project, for a task-sized context.
+
+Re-run it yourself:
+
+```bash
+cd examples/fintech-demo
+npx @morf_engineering/rainfalljs report
+npx @morf_engineering/rainfalljs condense --focus form.transactions.add
+```
+
+[`GROK_PROMPT.md`](examples/fintech-demo/GROK_PROMPT.md) is the prompt used to test
+whether an agent given only the digest can make a correct change — the part that decides
+whether the saving is real or just smaller.
+
+> **Read the numbers honestly.** They compare a digest against reading source files, on
+> one small app. A larger codebase moves the ratio up, and a task that genuinely needs
+> the source still needs the source. The digest tells an agent *where to look*; it does
+> not replace looking.
+
+---
+
+## FAQ
+
+### Does this work with frontends that aren't JavaScript?
+
+**Yes — that is the design, not a workaround.** The two things this tool produces are
+JSON files, not JavaScript:
+
+- **`rainfall.json`** — your map. Entities, endpoints, components, screens, flows.
+- **[`schema/components.json`](schema/components.json)** — the component-shape
+  catalogue: what each UI component type accepts as data and what props it produces.
+
+A SwiftUI, Flutter, Blazor, Django, Rails, Android or Unity frontend reads those the
+same way anything reads JSON, and implements the shapes natively. `rainfall components
+--json` prints the catalogue; `rainfall condense` prints the map. Neither output
+contains a line of JavaScript.
+
+The JS mapper (`/mapper`) is a convenience for projects that happen to be in JS. It is
+one implementation of the catalogue, not the definition of it.
+
+### So what actually requires Node?
+
+Only the CLI itself — it ships on npm, so running `rainfall validate` or `condense`
+needs Node on the machine or in CI. That is a build-time dependency, in the same way a
+linter is. **Nothing at runtime, in any language**, and the artifacts it produces
+outlive it: `rainfall.json` is a plain file you could hand-write and read with
+`json.load`.
+
+If you want the check in a non-Node CI, one step with `npx` covers it:
+
+```yaml
+- run: npx @morf_engineering/rainfalljs validate
+```
+
+### Will `rainfall scan` understand my Swift / Python / Go project?
+
+**No — and this is the honest limit.** `scan` reads React and Next.js source to seed a
+manifest. On any other stack it will find nothing useful.
+
+That matters less than it sounds, because `scan` only ever produces the skeleton. The
+parts worth having — entity fields, response shapes, which component needs which
+endpoint, the flows — require understanding the code, which is why the recommended
+path on *every* stack is:
+
+```bash
+npx @morf_engineering/rainfalljs prompt
+```
+
+and hand the output to an AI assistant, which reads your models and handlers and writes
+the manifest. That works the same whether the code is TypeScript or Kotlin.
+
+### Does my backend have to be JavaScript?
+
+No. Endpoints are **declared**, not introspected. An entry like
+
+```json
+{ "id": "API-001", "method": "GET", "path": "/api/score", "reads": ["User.goals"] }
+```
+
+says nothing about what serves it — Django, Rails, Go, a Lambda, or a mainframe behind a
+gateway. The Data Map's `access` field goes further and records the key expression
+behind an endpoint, which is usually a database concern with no language at all.
+
+### Isn't this just OpenAPI?
+
+They answer different questions and compose well. OpenAPI describes **the API**: routes,
+payloads, status codes. It does not say which screen calls a route, which component
+breaks if a field is renamed, or which business requirement the route exists to serve.
+
+This maps the consumers: requirement → endpoint → component → screen. Keep your OpenAPI
+spec; point the manifest's endpoint ids at it.
+
+### Is this only useful if I use AI?
+
+No. The token saving is the headline because it is measurable, but `validate` earns its
+place without an agent anywhere: it fails the build when a screen references an endpoint
+nobody declares, when an endpoint has no consumer, or when a requirement has nothing
+serving it. That is a stale-architecture-doc problem that has existed far longer than
+coding assistants have.
+
+### Do I have to use the component mapper?
+
+No. The map and the mapper are independent. Plenty of projects will want
+`rainfall.json` and `validate` in CI and nothing else.
 
 ---
 

@@ -10,6 +10,13 @@ Documentation only. No code change.
   verified to resolve: Tests, npm version, npm downloads, MIT.
 - **Added a `dependencies-0` badge.** It is the shortest true thing about this package
   and worth stating on the tin.
+- **New FAQ**, replacing the one dropped in 0.3.0. That FAQ was written pre-AI and
+  asked React questions — Context API, class components, Redux comparisons — about a
+  runtime this package no longer has. The new one leads with the question the old
+  framing obscured: whether this works with frontends that are not JavaScript. It
+  does, and the answer says how, including the one honest limit (`scan` reads
+  React/Next source only; every other stack builds its manifest via `rainfall
+  prompt` and an assistant, which is the recommended path on every stack anyway).
 - Republished so npmjs.com serves the current README. npm renders the README from the
   published tarball, so a docs change only reaches that page on a publish — which is
   why this is a version bump rather than a commit.
