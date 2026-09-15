@@ -29,6 +29,33 @@ Nothing evaporates. That is the whole trick.
 
 ---
 
+## About the name
+
+Rain does not fall once. It cycles — and that is the part of the metaphor the
+name is actually about.
+
+Water leaves the ocean, gathers as cloud, falls where it is needed, runs back,
+and leaves again. The ocean is never drained and the cloud is never a copy left
+to go stale; the same water keeps moving, and the system stays in balance because
+the return trip is part of it.
+
+Knowledge about a codebase should move the same way. It is lifted out of the code
+(`scan`), held in a compact form that is small enough to carry (`rainfall.json`),
+rained onto the work exactly where it is needed and no more than needed
+(`condense`), and returned — because the agent that changed the code updates the
+map in the same breath, and `validate` fails the build if it ever forgets.
+
+**The return trip is the whole design.** Documentation that only falls is a
+one-way trip: written once, accurate for a month, quietly wrong forever after,
+because nothing carries the knowledge back up. A cycle cannot drift, because
+drift is a broken build.
+
+So the name is not "data rains down onto your components." It is that the loop
+closes. Ocean, cloud, rain, ground, and back to the ocean — and nothing
+evaporates out of the system on the way.
+
+---
+
 ## The problem
 
 Ask an agent to change one endpoint and it reads dozens of files to rediscover which
