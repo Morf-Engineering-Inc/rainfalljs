@@ -1,6 +1,6 @@
 {
   "name": "@morf_engineering/rainfalljs",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Compact, validated data-layer manifests for token-efficient AI development \u2014 entities, endpoints, components and the requirements they serve, in one file your build can check.",
   "main": "dist/datamap/index.js",
   "files": [
