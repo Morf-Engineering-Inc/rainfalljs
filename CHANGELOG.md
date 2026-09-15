@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.3.2 — 2026-09-15
+
+Documentation only. Publishes what 0.3.1 did not.
+
+0.3.1 was published from main before #41 merged, so the npm tarball carried the
+badge fixes and nothing else — while the repo at the same version number carried
+three more documentation changes. Same version, two different contents. This bump
+exists to make the published README match the repo again.
+
+- **The logo renders.** `assets/logo.png` — the original was named
+  `_transparent` and was not: a pale grey was baked in behind the mark, so it
+  showed as a grey square in dark mode. Cleared by flood fill from the border
+  (a colour match would have punched holes through the near-white circuit
+  traces), cropped, and resized: 500 KB to 221 KB. Referenced by absolute URL,
+  because npmjs.com does not resolve relative image paths.
+- **A FAQ**, replacing the one 0.3.0 dropped. It leads with whether this works
+  from a frontend that is not JavaScript — it does, and the answer says how,
+  including the honest limit that `scan` reads React/Next source only.
+- **The demo is findable.** examples/fintech-demo had landed with 25 files and
+  was referenced nowhere in the README.
+- **The demo numbers were wrong and are corrected.** TOKENS.md called itself
+  reproducible while reporting 19 files / ~4977 tokens / 6.9x; the real figures
+  are 17 / ~3699 / 5.1x. Nothing was wrong with the tool — a measurement was
+  written down once and never re-run. Guarding this in CI is issue #43.
+
 ## 0.3.1 — 2026-09-15
 
 Documentation only. No code change.
