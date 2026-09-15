@@ -18,7 +18,22 @@ jobs:
         with:
           # Node 24 bundles npm 11+, required for npm Trusted Publishing.
           node-version: '24.x'
-          registry-url: 'https://registry.npmjs.org'
+          # NO `registry-url:` — deliberately.
+          #
+          # setup-node's registry-url writes an .npmrc with an auth line, and it
+          # writes one EVEN WITH NO TOKEN, using a literal placeholder. The last
+          # run proved it:
+          #
+          #     NODE_AUTH_TOKEN: XXXXX-XXXXX-XXXXX-XXXXX
+          #
+          # npm then tries that fake token instead of performing the OIDC
+          # exchange, publishes anonymously, and the registry answers 404 — which
+          # is what npm returns for an unauthorized publish, to avoid confirming
+          # a package exists. No OIDC attempt appears anywhere in the log.
+          #
+          # registry.npmjs.org is the default registry, so dropping this changes
+          # nothing except leaving npm with no token — which is exactly the
+          # condition that makes it use Trusted Publishing.
       - run: npm ci
       - run: npm test
       - run: npm run build
