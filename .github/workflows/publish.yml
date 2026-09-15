@@ -12,6 +12,11 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Declared at job level as well as workflow level. Redundant when it works,
+    # and the thing that fixes it when a repo default of `read` is in play.
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -39,8 +44,19 @@ jobs:
       - run: npm run build
       # Trusted Publishing needs npm >= 11.5.1. Node 24 ships npm 11, but printing
       # it makes the next failure readable instead of guesswork.
-      - name: npm version
-        run: npm --version
+      # Is an OIDC token actually available to this job? npm's Trusted Publishing
+      # looks for exactly these two variables; without them it silently skips the
+      # OIDC exchange and falls through to ENEEDAUTH, which is indistinguishable
+      # from "no credentials configured" in the log. Four failed runs looked
+      # identical because of that. Print it once and stop guessing.
+      - name: OIDC availability
+        run: |
+          echo "npm            : $(npm --version)"
+          echo "ID_TOKEN_URL   : ${ACTIONS_ID_TOKEN_REQUEST_URL:+present}${ACTIONS_ID_TOKEN_REQUEST_URL:-ABSENT}"
+          echo "ID_TOKEN_SECRET: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+present}${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-ABSENT}"
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
+            echo "::warning::No OIDC token in this job — GitHub did not grant id-token: write. Trusted Publishing cannot work until it does."
+          fi
 
       - name: Publish
         # NO `env: NODE_AUTH_TOKEN` here, deliberately.
