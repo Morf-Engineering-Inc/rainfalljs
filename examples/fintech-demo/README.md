@@ -10,15 +10,17 @@ npm install
 npm run dev   # http://localhost:3000
 ```
 
-## The demo branches
+## The A/B experiment
 
-- **`demo/fintech-baseline`** — this app, no Rainfall. Control group for AI-build tests.
-- **`demo/fintech-rainfall`** — same app plus `rainfall.json`, the agent skill, measured
-  token numbers (`TOKENS.md`), and an AI task prompt that uses the manifest.
+This copy (on `main`) is the **treatment**: the app plus `rainfall.json`, the agent
+skill, measured token numbers (`TOKENS.md`), and an AI task prompt that uses the
+manifest. The **control** lives on the `demo/fintech-baseline` branch: the identical
+app with no Rainfall.
 
-Both branches contain `GROK_PROMPT.md` with the **same feature task** — give each
-branch's prompt to an AI (Grok, Claude, Cursor, …) and compare how many tokens each
-run burns before the feature works. That difference is Rainfall's value, measured.
+Both carry `GROK_PROMPT.md` with the **same feature task** — give each version's
+prompt to an AI (Grok, Claude, Cursor, …) and compare how many tokens each run burns
+before the feature works. That difference is Rainfall's value, measured. Real numbers
+from `rainfall report` are in [`TOKENS.md`](TOKENS.md).
 
 ## Rainfall CLI (self-installed from this repo — no npm publish needed)
 
