@@ -283,6 +283,92 @@ See [`RECOMMENDATION.md`](RECOMMENDATION.md) for the rationale and
 
 ---
 
+## FAQ
+
+### Does this work with frontends that aren't JavaScript?
+
+**Yes — that is the design, not a workaround.** The two things this tool produces are
+JSON files, not JavaScript:
+
+- **`rainfall.json`** — your map. Entities, endpoints, components, screens, flows.
+- **[`schema/components.json`](schema/components.json)** — the component-shape
+  catalogue: what each UI component type accepts as data and what props it produces.
+
+A SwiftUI, Flutter, Blazor, Django, Rails, Android or Unity frontend reads those the
+same way anything reads JSON, and implements the shapes natively. `rainfall components
+--json` prints the catalogue; `rainfall condense` prints the map. Neither output
+contains a line of JavaScript.
+
+The JS mapper (`/mapper`) is a convenience for projects that happen to be in JS. It is
+one implementation of the catalogue, not the definition of it.
+
+### So what actually requires Node?
+
+Only the CLI itself — it ships on npm, so running `rainfall validate` or `condense`
+needs Node on the machine or in CI. That is a build-time dependency, in the same way a
+linter is. **Nothing at runtime, in any language**, and the artifacts it produces
+outlive it: `rainfall.json` is a plain file you could hand-write and read with
+`json.load`.
+
+If you want the check in a non-Node CI, one step with `npx` covers it:
+
+```yaml
+- run: npx @morf_engineering/rainfalljs validate
+```
+
+### Will `rainfall scan` understand my Swift / Python / Go project?
+
+**No — and this is the honest limit.** `scan` reads React and Next.js source to seed a
+manifest. On any other stack it will find nothing useful.
+
+That matters less than it sounds, because `scan` only ever produces the skeleton. The
+parts worth having — entity fields, response shapes, which component needs which
+endpoint, the flows — require understanding the code, which is why the recommended
+path on *every* stack is:
+
+```bash
+npx @morf_engineering/rainfalljs prompt
+```
+
+and hand the output to an AI assistant, which reads your models and handlers and writes
+the manifest. That works the same whether the code is TypeScript or Kotlin.
+
+### Does my backend have to be JavaScript?
+
+No. Endpoints are **declared**, not introspected. An entry like
+
+```json
+{ "id": "API-001", "method": "GET", "path": "/api/score", "reads": ["User.goals"] }
+```
+
+says nothing about what serves it — Django, Rails, Go, a Lambda, or a mainframe behind a
+gateway. The Data Map's `access` field goes further and records the key expression
+behind an endpoint, which is usually a database concern with no language at all.
+
+### Isn't this just OpenAPI?
+
+They answer different questions and compose well. OpenAPI describes **the API**: routes,
+payloads, status codes. It does not say which screen calls a route, which component
+breaks if a field is renamed, or which business requirement the route exists to serve.
+
+This maps the consumers: requirement → endpoint → component → screen. Keep your OpenAPI
+spec; point the manifest's endpoint ids at it.
+
+### Is this only useful if I use AI?
+
+No. The token saving is the headline because it is measurable, but `validate` earns its
+place without an agent anywhere: it fails the build when a screen references an endpoint
+nobody declares, when an endpoint has no consumer, or when a requirement has nothing
+serving it. That is a stale-architecture-doc problem that has existed far longer than
+coding assistants have.
+
+### Do I have to use the component mapper?
+
+No. The map and the mapper are independent. Plenty of projects will want
+`rainfall.json` and `validate` in CI and nothing else.
+
+---
+
 ## Upgrading from 0.2.x
 
 **0.3.0 removes the React runtime.** `DataProvider`, `useData`, `withData`,
