@@ -1,0 +1,144 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Morf-Engineering-Inc/rainfalljs/main/schema/rainfall.schema.json",
+  "rainfall": "1.0",
+  "project": {
+    "name": "fintrack",
+    "description": "Personal finance dashboard: accounts, transactions, budgets, net worth, insights.",
+    "stack": ["nextjs", "react", "in-memory-db"]
+  },
+  "entities": [
+    {
+      "id": "E001",
+      "name": "Account",
+      "source": "memory:lib/db.js",
+      "fields": {
+        "accountId": { "type": "string", "required": true },
+        "name": { "type": "string", "required": true },
+        "type": "checking|savings|credit|investment",
+        "balance": "number",
+        "currency": "string"
+      }
+    },
+    {
+      "id": "E002",
+      "name": "Transaction",
+      "source": "memory:lib/db.js",
+      "fields": {
+        "txId": { "type": "string", "required": true },
+        "accountId": { "type": "string", "required": true },
+        "date": "YYYY-MM-DD",
+        "merchant": "string",
+        "category": "groceries|dining|travel|transport|subscriptions|income|savings",
+        "amount": "number (negative = spend)"
+      }
+    },
+    {
+      "id": "E003",
+      "name": "Budget",
+      "source": "memory:lib/db.js",
+      "fields": {
+        "budgetId": { "type": "string", "required": true },
+        "category": { "type": "string", "required": true },
+        "monthlyLimit": "number",
+        "month": "YYYY-MM"
+      }
+    },
+    {
+      "id": "E004",
+      "name": "NetWorthPoint",
+      "source": "memory:lib/db.js",
+      "fields": { "month": { "type": "string", "required": true }, "total": "number" }
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "API-001",
+      "method": "GET",
+      "path": "/api/accounts",
+      "file": "pages/api/accounts.js",
+      "reads": ["Account"],
+      "writes": [],
+      "returns": { "accounts": "Account[]", "netWorth": "number" },
+      "components": ["C001", "C002"]
+    },
+    {
+      "id": "API-002",
+      "method": "GET",
+      "path": "/api/transactions",
+      "file": "pages/api/transactions.js",
+      "reads": ["Transaction"],
+      "writes": [],
+      "returns": { "transactions": "Transaction[]", "count": "number" },
+      "components": ["C001", "C002"]
+    },
+    {
+      "id": "API-003",
+      "method": "POST",
+      "path": "/api/transactions",
+      "file": "pages/api/transactions.js",
+      "reads": ["Account"],
+      "writes": ["Transaction", "Account"],
+      "returns": { "transaction": "Transaction" },
+      "components": ["C008"]
+    },
+    {
+      "id": "API-004",
+      "method": "GET",
+      "path": "/api/networth",
+      "file": "pages/api/networth.js",
+      "reads": ["NetWorthPoint"],
+      "writes": [],
+      "returns": { "history": "NetWorthPoint[]", "latest": "number", "changePct": "number" },
+      "components": ["C001", "C006"]
+    },
+    {
+      "id": "API-005",
+      "method": "GET",
+      "path": "/api/insights",
+      "file": "pages/api/insights.js",
+      "reads": ["Transaction", "Budget"],
+      "writes": [],
+      "returns": { "topCategory": "{category,amount}", "overBudget": "string[]", "savingsRate": "number" },
+      "components": ["C001", "C010"]
+    },
+    {
+      "id": "API-006",
+      "method": "GET",
+      "path": "/api/budgets",
+      "file": "pages/api/budgets.js",
+      "reads": ["Budget", "Transaction"],
+      "writes": [],
+      "returns": { "budgets": "Budget[] (+spent:number)" },
+      "components": ["C003", "C009"]
+    },
+    {
+      "id": "API-007",
+      "method": "GET",
+      "path": "/api/accounts/{id}",
+      "file": "pages/api/accounts/[id].js",
+      "reads": ["Account", "Transaction"],
+      "writes": [],
+      "returns": { "account": "Account", "transactions": "Transaction[]" },
+      "components": []
+    }
+  ],
+  "components": [
+    { "id": "C001", "name": "Dashboard", "file": "pages/index.js", "uiId": "screen.dashboard.main", "apis": ["API-001", "API-002", "API-004", "API-005"] },
+    { "id": "C002", "name": "TransactionsPage", "file": "pages/transactions.js", "uiId": "screen.transactions.main", "apis": ["API-001", "API-002"] },
+    { "id": "C003", "name": "BudgetsPage", "file": "pages/budgets.js", "uiId": "screen.budgets.main", "apis": ["API-006"] },
+    { "id": "C004", "name": "Header", "file": "components/Header.jsx", "uiId": "nav.header.main", "apis": [] },
+    { "id": "C005", "name": "AccountCard", "file": "components/AccountCard.jsx", "uiId": "card.dashboard.account", "apis": [] },
+    { "id": "C006", "name": "NetWorthChart", "file": "components/NetWorthChart.jsx", "uiId": "chart.dashboard.networth", "apis": ["API-004"] },
+    { "id": "C007", "name": "TransactionTable", "file": "components/TransactionTable.jsx", "uiId": "table.transactions.list", "apis": [] },
+    { "id": "C008", "name": "TransactionForm", "file": "components/TransactionForm.jsx", "uiId": "form.transactions.add", "apis": ["API-003"] },
+    { "id": "C009", "name": "BudgetBar", "file": "components/BudgetBar.jsx", "uiId": "bar.budgets.category", "apis": [] },
+    { "id": "C010", "name": "InsightCard", "file": "components/InsightCard.jsx", "uiId": "card.dashboard.insights", "apis": [] }
+  ],
+  "flows": [
+    { "id": "F001", "name": "view-dashboard", "steps": ["ui:screen.dashboard.main", "api:API-001", "entity:Account", "api:API-004", "ui:chart.dashboard.networth"] },
+    { "id": "F002", "name": "add-transaction", "steps": ["ui:form.transactions.add", "api:API-003", "entity:Transaction", "entity:Account", "api:API-002", "ui:table.transactions.list"] },
+    { "id": "F003", "name": "filter-transactions", "steps": ["ui:screen.transactions.main", "api:API-002", "entity:Transaction"] },
+    { "id": "F004", "name": "track-budgets", "steps": ["ui:screen.budgets.main", "api:API-006", "entity:Budget", "entity:Transaction", "ui:bar.budgets.category"] },
+    { "id": "F005", "name": "read-insights", "steps": ["ui:card.dashboard.insights", "api:API-005", "entity:Transaction", "entity:Budget"] }
+  ]
+}
