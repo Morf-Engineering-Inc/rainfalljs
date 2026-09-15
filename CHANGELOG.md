@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.3.0 — 2026-09-15
+
+**Breaking: the React runtime is removed.** The manifest tool is the package.
+
+### Removed
+
+- `DataProvider`, `useData`, `withData`, `NextDataProvider`, `withServerSideData`,
+  `createApiRoute`, and the React/Next peer dependencies and babel build. A Context
+  data layer that `@tanstack/react-query` does better. The root entry threw
+  `MODULE_NOT_FOUND` on every 0.1.x release, so a working consumer is unlikely; pin
+  `0.2.0` if you were one.
+- `react-data-provider/` — a tracked `package.json` and 297-entry lockfile with no
+  tracked source. Most of the 77 vulnerabilities GitHub reported were its.
+- The rollup/microbundle toolchain, referenced by no script.
+- `HONEST_VALUE_ASSESSMENT.md` and a 1.2 MB unused image (still in history from #15).
+
+### Added
+
+- **`rainfall components [--json]`** — the component-shape catalogue: what each UI
+  component type accepts as data and produces as props. Eleven shapes: Select, Table,
+  List, Card, Tabs, Timeline, Chart, Stat, KeyValue, Tree, Form.
+- **`schema/components.json`** — that catalogue as data, so a SwiftUI, Flutter,
+  Blazor, Django or Rails frontend can read the same contract and implement it
+  natively. The JS mappings are a convenience, not the point.
+- **`@morf_engineering/rainfalljs/mapper`** — component mapping without React. Pure
+  `(data, options) => props`. The 0.2.x mapper called `useData()` internally, so it
+  only ran inside a React tree, which is why it was never tested.
+- **The Data Map** (`defineDataMap`, `validate`, `brief`) — the typed model, adding
+  business requirements and access patterns (key expression + index) to the manifest's
+  entities/endpoints/components.
+
+### Fixed
+
+- **The CLI was documented and unshippable.** The README advertised `npx rainfall …`
+  while `package.json` had no `bin` field and `files` excluded `bin/` and `cli/`.
+- `__tests__/package.test.js` now *executes* the CLI and resolves every path in
+  `exports`, `bin` and `main`. The suite it replaces read the bundle as text looking
+  for a substring, which is how 0.1.3 shipped three unusable versions green.
+- An unregistered mapping throws instead of returning raw data behind a
+  `console.warn` — which rendered a blank panel with no error anywhere.
+- 0 vulnerabilities; devDependencies 20 → 2; no runtime dependencies.
+- `repository.url` normalized, so npm stops auto-correcting it at publish time.
+
 ## 0.2.0 — 2026-08-18
 
 RainfallJS pivots toward AI-assisted development: the water cycle now describes how
@@ -33,7 +76,7 @@ knowledge about your app's data layer flows into (and back out of) AI coding ses
 ### Unchanged
 
 - The original React/Next.js data-provider library (`DataProvider`, `useData`,
-  component mapping, `NextDataProvider`) ships as before.
+  component mapping, `NextDataProvider`) ships as before. *(Removed in 0.3.0.)*
 
 ## 0.1.3 and earlier
 

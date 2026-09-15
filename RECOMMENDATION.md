@@ -5,6 +5,10 @@ the pivot implemented in this PR.
 
 ## What's in the repo today
 
+> **Historical note (0.3.0, 2026-09-15).** The React library described in point 1 was
+> removed. This document records the reasoning that led to the manifest, and is kept
+> as written; it is not a description of the current package. See CHANGELOG.md.
+
 1. **The library** (`src/`, ~570 lines): a React Context wrapper (`DataProvider`,
    `useData`, `withData`) plus prop-mapping helpers for MUI/AntD/Radix/shadcn, and
    Next.js helpers (`NextDataProvider`, `withServerSideData`, `createApiRoute`).
