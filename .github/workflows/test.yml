@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -16,9 +17,21 @@ jobs:
       with:
         node-version: '24.x'
         cache: 'npm'
+
+    # `npm ci` only. The previous version ran `npm install` first, which can
+    # rewrite package-lock.json — so the `npm ci` that followed was validating a
+    # lockfile the same job had just edited, which is the one thing `npm ci`
+    # exists to prevent.
     - name: Install dependencies
       run: npm ci
-    - name: Run tests
+
+    - name: Typecheck
+      run: npm run typecheck
+
+    # `npm test` is `npm run build && jest`, so the build is covered here. It has
+    # to be: the suite requires dist/, and the 0.1.3 failure was a build that
+    # emitted a file the entry point did not import.
+    - name: Build and test
       run: npm test
     - name: Build
       run: npm run build

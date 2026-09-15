@@ -1,1012 +1,274 @@
 # RainfallJS
 
-[![Build Status](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/publish.yml/badge.svg)](https://github.com/morf_engineering/rainfalljs/actions)
 [![Tests](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml/badge.svg)](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml)
 [![npm version](https://img.shields.io/npm/v/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![npm downloads](https://img.shields.io/npm/dm/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
 
-A comprehensive data integration solution for React and Next.js applications that provides automated, secure, and reliable data handling. 
+**One map of your data layer — front end, middle, back end — that your build keeps
+honest.**
 
-## About the Name
-**RainfallJS**: Just as rain naturally flows from clouds down to nourish plants below, data "rains" down from your data sources to feed your React components. The name reflects our philosophy that data flow should be as natural, reliable, and effortless as rainfall - distributed exactly where it's needed without manual intervention. This project aims to be guided by principles that guide engineering like shown [here](https://react.dev/learn/thinking-in-react).
+Entities, endpoints, the component hierarchy that renders them, the screens they land
+on, and the business requirements they serve. One file. Checked in CI.
 
-## 🌧️ New Direction: Rainfall for AI — Token-Optimized Data Context
+It is the linchpin that keeps the front end and the back end locked together while both
+change: rename a field and the map says which components break; add a screen and it says
+which endpoint nothing serves. And because it is small and typed, an AI agent reads the
+whole data layer in a few hundred tokens instead of rediscovering it file by file, every
+session.
 
-Rainfall is evolving into a tool that helps **AI coding agents build web apps with far fewer tokens**. The water cycle now describes the AI knowledge loop:
-
-- **Ocean** → your codebase and database (source of truth)
-- **Evaporation** → `rainfall scan` lifts structure out of the code
-- **Cloud** → `rainfall.json`, a compact manifest of entities → APIs → components
-- **Rainfall** → `rainfall condense` rains precise, few-hundred-token context onto each AI session
-- **The cycle** → agents update the manifest as they change code, so knowledge never evaporates
-
-Instead of an AI re-reading dozens of files every session to rediscover which component calls which API (tens of thousands of tokens), it reads one condensed digest and refers to everything by stable IDs like `C001`, `API-002`, and `card.home.score`.
-
-```bash
-# One-off, no install needed:
-npx @morf_engineering/rainfalljs init       # create a starter rainfall.json
-npx @morf_engineering/rainfalljs scan       # seed it from your React/Next.js code
-
-# Or install it, then use the short command:
-npm install -D @morf_engineering/rainfalljs
-npx rainfall validate      # check structure + referential integrity
-npx rainfall condense      # print the compact AI context digest + token estimate
-npx rainfall condense --focus card.home.score   # just one item's subgraph (for large apps)
-npx rainfall report        # tokens-saved report: digest vs reading the source
+```
+      ocean        your database and code — the source of truth
+        ↓ evaporation      rainfall scan lifts the structure out
+      cloud        rainfall.json — entities → endpoints → components → screens
+        ↓ rainfall         rainfall condense rains precise context into a session
+      ground       the agent changes code, and updates the map as it goes
+        ↺ the cycle        validate fails the build if the two ever part
 ```
 
-**The AI skill:** drop [`skills/rainfall-manifest/SKILL.md`](skills/rainfall-manifest/SKILL.md) into your project's `.claude/skills/rainfall-manifest/` (or hand it to any agent) and the AI will read, use, and maintain the manifest automatically.
+Nothing evaporates. That is the whole trick.
 
-**Let your AI build the manifest for you:** the scan only finds the skeleton — entities, read/write mappings, response shapes, and flows need code understanding, which is an AI's job. If your agent has the skill installed, just ask it to "bootstrap a rainfall manifest". Otherwise run:
+---
+
+## The problem
+
+Ask an agent to change one endpoint and it reads dozens of files to rediscover which
+component calls what. Every session. Tens of thousands of tokens, most of it
+rediscovering what was already true yesterday.
+
+The obvious fix is an architecture document. The reason that has never worked is that
+nothing checks it, so it is wrong within a month and then actively misleads.
+
+## The fix
+
+One manifest, and a build step that fails when it stops matching the code.
+
+```
+rainfall.json          entities → endpoints → components → screens → requirements
+rainfall validate      referential integrity: a dangling reference is an error
+rainfall condense      the whole data layer, a few hundred tokens, for a prompt
+```
+
+Small is easy. **Small and verified** is the part that has not existed before.
+
+On a real codebase — a genealogy research app with a 43-noun vocabulary and a
+52-surface register — **113 KB of documents and registers condensed to 14 KB.** Roughly
+28,000 tokens down to 3,500. And it is current, because `validate` runs in CI.
+
+It also found three things the prose had missed, including a core domain entity with a
+route, an API client and a Lambda, and **no row in the surface register**.
+
+---
+
+## Install
+
+```bash
+npx @morf_engineering/rainfalljs init     # no install needed
+npx @morf_engineering/rainfalljs scan     # seed it from your code
+```
+
+```bash
+npm install -D @morf_engineering/rainfalljs
+npx rainfall validate
+```
+
+**No runtime dependencies.** Node ≥ 18.
+
+## Commands
+
+| Command | Does |
+|---|---|
+| `rainfall init [name]` | create a starter `rainfall.json` |
+| `rainfall scan [dir]` | seed the manifest from a React/Next.js project |
+| `rainfall validate [file]` | structure and referential integrity — **run this in CI** |
+| `rainfall condense [file] [--focus <ref>]` | the compact digest; `--focus` limits it to one item and everything it touches |
+| `rainfall report [dir]` | tokens saved: digest versus reading the source |
+| `rainfall components [--json]` | UI component shapes and their data contracts |
+| `rainfall prompt` | AI instructions for building the manifest |
+
+## What `condense` prints
+
+```
+RAINFALL v1.0 — mealcoach-example (nextjs, dynamodb, react-query)
+
+## Entities (the ocean — source of truth)
+E001 User{userId,email,goals:string[]} @ dynamodb:AppTable
+E002 Meal{mealId,userId,name,score:number,createdAt:datetime} @ dynamodb:AppTable
+
+## Endpoints (evaporation — data lifted from the ocean)
+API-001 GET /api/score reads:User.goals,Meal.score returns:{overall:number} → C001
+API-002 POST /api/meals writes:Meal returns:{mealId,score:number} → C002
+
+## Components (rainfall — where data lands)
+C001 ScoreCard components/ScoreCard.jsx ui:card.home.score apis:API-001
+C002 MealLogger components/MealLogger.jsx ui:form.meal.log apis:API-002
+
+## Flows (the cycle — end-to-end paths)
+F001 log-meal: ui:form.meal.log → api:API-002 → entity:Meal → api:API-001 → ui:card.home.score
+
+~215 tokens (manifest JSON itself: ~509 tokens)
+```
+
+Everything is referred to by a stable id — `E001`, `API-002`, `card.home.score` — so an
+agent names things instead of re-deriving them.
+
+---
+
+## Component shapes — for any frontend, in any language
+
+`rainfall components` lists every UI component type, what data it accepts, and what
+props it produces:
+
+```
+Select    Choose one of many — select, dropdown, radio group, autocomplete
+          in : Row[] — an array of records
+          out: { items: { value, label }[] }
+          opt: valueField, labelField
+
+Table     Rows and columns — table, data grid, spreadsheet
+          in : Row[] — columns are derived from the first row unless given
+          out: { columns: { id, header }[], rows: Row[] }
+          opt: columns, headers
+```
+
+Eleven shapes: `Select` `Table` `List` `Card` `Tabs` `Timeline` `Chart` `Stat`
+`KeyValue` `Tree` `Form`.
+
+**This is data, not code.** It lives in
+[`schema/components.json`](schema/components.json), so a SwiftUI, Flutter, Blazor,
+Django or Rails frontend can read the same contract and implement it natively —
+`rainfall components --json` prints it. The JS implementations below are a
+convenience for JS projects, not the point.
+
+They are named after the **shape they produce**, never after a UI library. `Table` is a
+shape; `MuiDataGrid` would be a dependency, and a promise this package cannot keep as
+that library changes.
+
+### If you are in JS
+
+```js
+import { useGenericMappings, mapProps } from '@morf_engineering/rainfalljs/mapper';
+
+useGenericMappings();
+
+mapProps('generic', 'Select', users, { valueField: 'id', labelField: 'name' });
+// → { items: [{ value: '1', label: 'Ada' }, …] }
+```
+
+A mapping is a pure function — `(data, options) => props`. No React, no hooks, no DOM.
+Register your own on top:
+
+```js
+import { defineMappings } from '@morf_engineering/rainfalljs/mapper';
+
+defineMappings('acme', {
+  Table: (data, { headers = {} }) => ({
+    rows: data,
+    columns: Object.keys(data[0] ?? {}).map((id) => ({ id, header: headers[id] ?? id })),
+  }),
+});
+```
+
+Registering twice merges, later wins per component, so you can adjust one mapping
+without restating the rest. An unregistered mapping **throws** — returning raw data
+instead gives you a blank panel and no error anywhere.
+
+---
+
+## The Data Map — the typed API
+
+The same model, as a TypeScript module, when you want to query it in a test or a script
+rather than print it:
+
+```js
+import { defineDataMap, validate, brief } from '@morf_engineering/rainfalljs';
+
+const map = defineDataMap({
+  name: 'Acme',
+  requirements: [{ id: 'BR-1', statement: 'A customer sees their invoices.',
+                   endpoints: ['INV'], screens: ['billing'], state: 'built' }],
+  endpoints:    [{ id: 'INV', path: '/invoices', method: 'GET', state: 'built',
+                   access: { mode: 'read', key: 'Query PK = TENANT#<tid>' } }],
+  components:   [{ id: 'Table', name: 'Invoice table', state: 'built',
+                   needs: [{ endpoint: 'INV', flow: 'FETCH' }] }],
+  screens:      [{ id: 'billing', name: 'Billing', route: '/billing',
+                   components: ['Table'], state: 'built' }],
+});
+
+map.consumersOf('INV');   // what breaks if I change this endpoint
+map.trace('BR-1');        // requirement → endpoints → screens → components
+map.subtreeOf('Page');    // a component and everything it renders
+map.parentOf('Row');      // what renders this one
+validate(map);            // dangling refs, render cycles and state conflicts are errors
+brief(map);               // the digest
+```
+
+Components nest via `children`, so the map matches how a UI is actually built. A screen
+names its top-level components; those name theirs. `endpointsFor(screen)` then resolves
+an endpoint fetched four levels down without the screen restating it, and `brief` prints
+the tree:
+
+```
+S1       /dash  Dashboard
+         Page
+           └ Panel
+             └ Row  ←E2
+         endpoints:  E2
+```
+
+It adds two layers the manifest does not yet carry: **business requirements** (what the
+product must do, and what it refuses) and **access patterns** (the key expression and
+index behind each endpoint) — so the map runs from a business statement all the way to
+a DynamoDB key.
+
+Full guide: **[docs/DATA-MAP.md](docs/DATA-MAP.md)**.
+
+---
+
+## Using it with an agent
+
+Drop [`skills/rainfall-manifest/SKILL.md`](skills/rainfall-manifest/SKILL.md) into
+`.claude/skills/rainfall-manifest/` and your agent will read, use and maintain the
+manifest on its own.
+
+Or have it build one for you:
 
 ```bash
 npx @morf_engineering/rainfalljs prompt
 ```
 
-and paste the printed instructions into Claude, Cursor, or any coding assistant. The AI will seed the manifest with `scan`, enrich it by reading your models and handlers, verify it with `validate`, and finish by showing you your own `report` numbers — plus a standing instruction to keep the manifest updated from then on.
+Paste the output into Claude, Cursor, or any coding assistant. `scan` finds the
+skeleton; entities, response shapes and flows need code understanding, which is the
+agent's job.
 
-See [`RECOMMENDATION.md`](RECOMMENDATION.md) for the full rationale, [`schema/rainfall.schema.json`](schema/rainfall.schema.json) for the manifest format, and [`examples/manifest/rainfall.json`](examples/manifest/rainfall.json) for a worked example.
+Then in CI:
+
+```yaml
+- run: npx rainfall validate
+```
+
+That last line is the whole argument. An architecture doc that fails the build is a
+different kind of object from one that does not.
+
+See [`RECOMMENDATION.md`](RECOMMENDATION.md) for the rationale and
+[`schema/rainfall.schema.json`](schema/rainfall.schema.json) for the manifest format.
 
 ---
 
-The original React data-provider library below still works and is unchanged.
+## Upgrading from 0.2.x
 
-## Features
+**0.3.0 removes the React runtime.** `DataProvider`, `useData`, `withData`,
+`NextDataProvider`, `withServerSideData` and `createApiRoute` are gone, along with the
+React and Next peer dependencies and the babel build.
 
-- 🔄 **Automated Data Flow** - Effortlessly connect components to data sources
-- 🔒 **Security Built-in** - Secure data handling with authentication and validation
-- 🚀 **Next.js Integration** - Special features for Next.js applications
-- ⚡ **Performance Optimized** - Smart caching and minimal re-renders
-- 🧩 **Component Agnostic** - Works with both functional and class components
-- 🎛️ **Component Library Integration** - Automatic mapping to UI component libraries
+They were a Context-based data layer that `@tanstack/react-query` does better, and they
+were never the reason to install this. Two devDependencies remain where there were
+twenty; there are no runtime dependencies and no vulnerabilities.
 
-## Installation
+If you were using them — and the root entry threw `MODULE_NOT_FOUND` on every 0.1.x
+release, so this is unlikely — pin `0.2.0` or move to React Query.
 
-```bash
-npm install @morf_engineering/rainfalljs
-
-# or if you use yarn
-yarn add @morf_engineering/rainfalljs
-```
-
-## Basic Usage
-
-### Simple Data Provider
-
-```jsx
-import { DataProvider, useData } from '@morf_engineering/rainfalljs';
-
-// Your component that needs data
-const UserProfile = () => {
-  const { data, loading, error } = useData();
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return (
-    <div>
-      <h1>{data.name}</h1>
-      <p>Email: {data.email}</p>
-    </div>
-  );
-};
-
-// Wrap with DataProvider
-const App = () => (
-  <DataProvider source="/api/user">
-    <UserProfile />
-  </DataProvider>
-);
-```
-
-### Next.js Integration
-
-```jsx
-import { NextDataProvider } from '@morf_engineering/rainfalljs';
-
-// Your Next.js page
-export default function Dashboard({ initialData }) {
-  // Route-based data mapping
-  const routeMapping = {
-    '/dashboard': '/api/dashboard-data',
-    '/dashboard/users': '/api/users',
-    '/dashboard/analytics': '/api/analytics'
-  };
-  
-  return (
-    <NextDataProvider 
-      routeMapping={routeMapping}
-      defaultSource="/api/default"
-      initialData={initialData}
-    >
-      <DashboardContent />
-    </NextDataProvider>
-  );
-}
-
-// Server-side data fetching
-import { withServerSideData } from '@morf_engineering/rainfalljs';
-
-export const getServerSideProps = withServerSideData(
-  async (context) => {
-    // Your existing getServerSideProps logic
-    return { props: { otherProp: 'value' } };
-  },
-  {
-    source: '/api/dashboard-data'
-  }
-);
-```
-
-### Creating API Routes in Next.js
-
-```jsx
-// pages/api/users.js
-import { createApiRoute } from '@morf_engineering/rainfalljs';
-
-export default createApiRoute(
-  async (req, res) => {
-    // Fetch users from database
-    const users = await db.getUsers();
-    return users;
-  },
-  {
-    requireAuth: true,
-    exposeErrors: process.env.NODE_ENV !== 'production'
-  }
-);
-```
-
-## Component Library Integration
-
-RainfallJS provides automatic data mapping to UI component libraries like Material-UI and Ant Design:
-
-```jsx
-import { DataProvider, withComponentData, registerMUIComponents } from '@morf_engineering/rainfalljs';
-import { DataGrid } from '@mui/x-data-grid';
-
-// Register Material UI components (do this once in your app)
-registerMUIComponents();
-
-// Create a mapped component
-const UsersGrid = withComponentData(DataGrid, 'mui', 'DataGrid');
-
-// Use it with your data provider
-function UsersList() {
-  return (
-    <DataProvider source="/api/users">
-      <UsersGrid />
-    </DataProvider>
-  );
-}
-```
-
-### Using Hooks Pattern
-
-```jsx
-import { useData, useComponentData } from '@morf_engineering/rainfalljs';
-import { Table } from 'antd';
-
-function UserTable() {
-  // Get the component props automatically mapped from your data
-  const { mappedProps } = useComponentData('antd', 'Table', {
-    headers: {
-      userId: 'User ID',
-      fullName: 'Full Name'
-    }
-  });
-  
-  return <Table {...mappedProps} />;
-}
-```
-
-```markdown
-
-### Radix UI Integration
-
-RainfallJS provides seamless integration with Radix UI's unstyled, accessible components:
-
-```jsx
-import { DataProvider, registerRadixComponents, useComponentData } from '@morf_engineering/rainfalljs';
-import * as Select from '@radix-ui/react-select';
-
-// Register Radix UI component mappings (do this once in your app)
-registerRadixComponents();
-
-// Example: Radix UI Select with automatic data mapping
-function UserSelect() {
-  const { mappedProps, loading, error } = useComponentData('radix', 'Select', {
-    valueField: 'id',
-    labelField: 'name'
-  });
-  
-  if (loading) return <div>Loading...</div>;
-  
-  return (
-    <Select.Root>
-      <Select.Trigger>
-        <Select.Value placeholder="Select a user" />
-        <Select.Icon />
-      </Select.Trigger>
-      
-      <Select.Portal>
-        <Select.Content>
-          <Select.Viewport>
-            {mappedProps.items.map((item) => (
-              <Select.Item key={item.value} value={item.value}>
-                <Select.ItemText>{item.label}</Select.ItemText>
-                <Select.ItemIndicator />
-              </Select.Item>
-            ))}
-          </Select.Viewport>
-        </Select.Content>
-      </Select.Portal>
-    </Select.Root>
-  );
-}
-
-// Use it with your data provider
-function UserSelection() {
-  return (
-    <DataProvider source="/api/users">
-      <UserSelect />
-    </DataProvider>
-  );
-}
-```
-
-RainfallJS handles the complexities of Radix UI's compound component pattern, automatically mapping your data to the appropriate format for Radix components like Select, Dialog, and Tabs.
-
-
-Let me create a component mapping integration for shadcn/ui, which is built on top of Radix UI but with pre-styled components and a more cohesive API:
-
-```javascript
-// examples/component-mapping/shadcn-example.js
-import React from 'react';
-import { DataProvider } from '@morf_engineering/rainfalljs';
-import { registerComponentLibrary, withComponentData, useComponentData } from '@morf_engineering/rainfalljs';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-// Register shadcn/ui component mappings
-export const registerShadcnComponents = () => {
-  registerComponentLibrary('shadcn', {
-    // Select mapping
-    Select: (data, props, options) => {
-      const { valueField = 'value', labelField = 'label' } = options;
-      
-      let items = [];
-      if (Array.isArray(data)) {
-        items = data.map(item => ({
-          value: item[valueField] || item.id || item.value,
-          label: item[labelField] || item.name || item.label
-        }));
-      }
-      
-      return {
-        items,
-        placeholder: options.placeholder || "Select an option",
-        defaultValue: options.defaultValue || items[0]?.value,
-        ...options.selectOptions
-      };
-    },
-    
-    // Table mapping
-    Table: (data, props, options) => {
-      // Extract column definitions
-      let columns = [];
-      if (data && data.length > 0) {
-        columns = Object.keys(data[0]).map(key => ({
-          id: key,
-          header: options.headers?.[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'),
-          accessorKey: key,
-          ...options.columnOptions?.[key]
-        }));
-      }
-      
-      return {
-        data: Array.isArray(data) ? data : [],
-        columns: options.columns || columns,
-        caption: options.caption || "",
-        ...options.tableOptions
-      };
-    },
-    
-    // Card mapping
-    Card: (data, props, options) => {
-      return {
-        title: data?.title || options.defaultTitle || 'Card Title',
-        description: data?.description || options.defaultDescription || '',
-        content: data?.content || data,
-        footer: data?.footer || options.footer || null,
-        ...options.cardOptions
-      };
-    },
-    
-    // Tabs mapping
-    Tabs: (data, props, options) => {
-      let tabs = [];
-      if (Array.isArray(data)) {
-        tabs = data.map(item => ({
-          value: item[options.valueField || 'id'] || item.id || item.value,
-          label: item[options.labelField || 'title'] || item.title || item.label,
-          content: item[options.contentField || 'content'] || item.content || item.description
-        }));
-      }
-      
-      return {
-        tabs,
-        defaultValue: data?.[0]?.[options.valueField || 'id'] || 'tab1',
-        ...options.tabsOptions
-      };
-    }
-  });
-};
-
-// Register the components
-registerShadcnComponents();
-
-// Example: shadcn/ui Select with automatic data mapping
-const UserSelect = () => {
-  const { mappedProps, loading, error } = useComponentData('shadcn', 'Select', {
-    valueField: 'id',
-    labelField: 'name',
-    placeholder: "Select a user"
-  });
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return (
-    <Select defaultValue={mappedProps.defaultValue} {...mappedProps.selectOptions}>
-      <SelectTrigger>
-        <SelectValue placeholder={mappedProps.placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        {mappedProps.items.map((item) => (
-          <SelectItem key={item.value} value={item.value}>
-            {item.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-};
-
-// Example: shadcn/ui Table with data mapping
-const UsersTable = () => {
-  const { mappedProps, loading, error } = useComponentData('shadcn', 'Table', {
-    headers: {
-      id: 'ID',
-      name: 'Full Name',
-      email: 'Email Address',
-      role: 'User Role'
-    },
-    caption: "List of system users"
-  });
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return (
-    <Table>
-      {mappedProps.caption && <TableCaption>{mappedProps.caption}</TableCaption>}
-      <TableHeader>
-        <TableRow>
-          {mappedProps.columns.map((column) => (
-            <TableHead key={column.id}>{column.header}</TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {mappedProps.data.map((row) => (
-          <TableRow key={row.id}>
-            {mappedProps.columns.map((column) => (
-              <TableCell key={`${row.id}-${column.id}`}>
-                {row[column.accessorKey]}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-};
-
-// Example: shadcn/ui Card with data mapping
-const UserCard = withComponentData(
-  ({ title, description, content, footer }) => (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {typeof content === 'object' ? (
-          <div>
-            <p><strong>Name:</strong> {content.name}</p>
-            <p><strong>Email:</strong> {content.email}</p>
-            <p><strong>Role:</strong> {content.role}</p>
-          </div>
-        ) : (
-          <p>{content}</p>
-        )}
-      </CardContent>
-      {footer && (
-        <CardFooter>
-          {footer}
-        </CardFooter>
-      )}
-    </Card>
-  ),
-  'shadcn',
-  'Card',
-  {
-    defaultTitle: 'User Profile',
-    defaultDescription: 'User details and information',
-    footer: <button className="btn btn-primary">Edit Profile</button>
-  }
-);
-
-// Example: shadcn/ui Tabs with data mapping
-const ProjectTabs = () => {
-  const { mappedProps, loading, error } = useComponentData('shadcn', 'Tabs', {
-    valueField: 'id',
-    labelField: 'name',
-    contentField: 'description'
-  });
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return (
-    <Tabs defaultValue={mappedProps.defaultValue}>
-      <TabsList>
-        {mappedProps.tabs.map(tab => (
-          <TabsTrigger key={tab.value} value={tab.value}>
-            {tab.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-      {mappedProps.tabs.map(tab => (
-        <TabsContent key={tab.value} value={tab.value}>
-          {tab.content}
-        </TabsContent>
-      ))}
-    </Tabs>
-  );
-};
-
-// Complete example with DataProvider
-const Dashboard = () => {
-  const users = [
-    { id: '1', name: 'John Doe', email: 'john@example.com', role: 'Admin' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'Developer' },
-    { id: '3', name: 'Bob Johnson', email: 'bob@example.com', role: 'Designer' }
-  ];
-  
-  const projects = [
-    { id: 'proj1', name: 'Website Redesign', description: 'Complete overhaul of the company website with new branding.' },
-    { id: 'proj2', name: 'Mobile App', description: 'New mobile application for customer engagement and loyalty.' },
-    { id: 'proj3', name: 'Dashboard', description: 'Internal analytics dashboard for tracking KPIs.' }
-  ];
-  
-  return (
-    <div className="dashboard">
-      <h1>Dashboard</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h2 className="text-xl font-semibold mb-4">User Selection</h2>
-          <DataProvider source={users}>
-            <UserSelect />
-          </DataProvider>
-        </div>
-        
-        <div>
-          <h2 className="text-xl font-semibold mb-4">User Profile</h2>
-          <DataProvider source={users[0]}>
-            <UserCard />
-          </DataProvider>
-        </div>
-      </div>
-      
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">All Users</h2>
-        <DataProvider source={users}>
-          <UsersTable />
-        </DataProvider>
-      </div>
-      
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Projects</h2>
-        <DataProvider source={projects}>
-          <ProjectTabs />
-        </DataProvider>
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
-```
-
-```markdown
-### shadcn/ui Integration
-
-RainfallJS provides elegant integration with shadcn/ui's beautifully designed components:
-
-```jsx
-import { DataProvider, registerShadcnComponents, useComponentData } from '@morf_engineering/rainfalljs';
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-
-// Register shadcn components (do this once in your app)
-registerShadcnComponents();
-
-// Create a data-aware table with automatic mapping
-function UsersTable() {
-  const { mappedProps, loading, error } = useComponentData('shadcn', 'Table', {
-    headers: {
-      id: 'ID',
-      name: 'Full Name',
-      email: 'Email Address'
-    },
-    caption: "System Users"
-  });
-  
-  if (loading) return <div>Loading...</div>;
-  
-  return (
-    <Table>
-      <TableCaption>{mappedProps.caption}</TableCaption>
-      <TableHeader>
-        <TableRow>
-          {mappedProps.columns.map((column) => (
-            <TableHead key={column.id}>{column.header}</TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {mappedProps.data.map((row) => (
-          <TableRow key={row.id}>
-            {mappedProps.columns.map((column) => (
-              <TableCell key={`${row.id}-${column.id}`}>
-                {row[column.accessorKey]}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-}
-
-// Use it with your data
-function UsersList() {
-  return (
-    <DataProvider source="/api/users">
-      <UsersTable />
-    </DataProvider>
-  );
-}
-```
-
-RainfallJS supports all major shadcn/ui components including Select, Table, Card, and Tabs, automatically handling the complex component composition patterns for you.
-```
-
-This integration leverages the componentized nature of shadcn/ui while providing automatic data mapping to make it extremely simple to connect your data to the UI.
-
-
-## Advanced Usage
-
-### Custom Data Sources
-
-```jsx
-import { createDataSource, DataProvider } from '@morf_engineering/rainfalljs';
-
-// Create a custom data source
-const userDataSource = createDataSource({
-  endpoint: 'https://api.example.com/users',
-  method: 'GET',
-  params: { limit: 10 }
-});
-
-// Use the custom data source
-const App = () => (
-  <DataProvider 
-    source={userDataSource}
-    options={{
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    }}
-  >
-    <UserList />
-  </DataProvider>
-);
-```
-
-### Data Transformation
-
-```jsx
-<DataProvider
-  source="/api/data"
-  options={{
-    transform: (data) => {
-      // Transform data before it reaches components
-      return data.map(item => ({
-        ...item,
-        fullName: `${item.firstName} ${item.lastName}`,
-        createdAt: new Date(item.createdAt)
-      }));
-    }
-  }}
->
-  <MyComponent />
-</DataProvider>
-```
-
-### With Class Components
-
-```jsx
-import { withData } from '@morf_engineering/rainfalljs';
-
-class UserProfile extends React.Component {
-  render() {
-    const { data, loading, error } = this.props;
-    
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-    
-    return (
-      <div>
-        <h1>{data.name}</h1>
-        <p>Email: {data.email}</p>
-      </div>
-    );
-  }
-}
-
-// Connect the component to data
-export default withData(UserProfile);
-```
-
-## API Reference
-
-### `DataProvider`
-
-Main provider component that fetches and provides data.
-
-**Props:**
-- `source` (String|Function|Object): Data source - can be API endpoint, function, or direct data
-- `options` (Object): Configuration options for data fetching
-- `secure` (Boolean): Enable security measures (default: true)
-- `initialData` (Any): Initial data to use before fetching
-
-### `useData`
-
-React hook for accessing data in functional components.
-
-**Returns:**
-- `data` (Any): The fetched data
-- `loading` (Boolean): Loading state
-- `error` (String): Error message if fetch failed
-- `refresh` (Function): Function to trigger data refresh
-
-### `withData`
-
-HOC for connecting class components to data.
-
-**Parameters:**
-- `Component` (Component): React component to enhance
-- `mapDataToProps` (Function, optional): Maps data to component props
-
-### Component Library Integration
-
-#### `registerComponentLibrary`
-
-Register mapping functions for a component library.
-
-**Parameters:**
-- `libraryName` (String): Name of the component library
-- `mappings` (Object): Object with component mappings
-
-#### `withComponentData`
-
-HOC that connects a component to data with automatic prop mapping.
-
-**Parameters:**
-- `Component` (Component): React component to enhance
-- `libraryName` (String): Name of the registered library
-- `componentType` (String): Type of component in the library
-- `options` (Object): Mapping options and overrides
-
-#### `useComponentData`
-
-Hook version for functional components.
-
-**Parameters:**
-- `libraryName` (String): Name of the registered library
-- `componentType` (String): Type of component in the library
-- `options` (Object): Mapping options and overrides
-
-**Returns:**
-- `loading` (Boolean): Loading state
-- `error` (String): Error message if any
-- `mappedProps` (Object): Props mapped from data
-
-### Next.js Integration
-
-#### `NextDataProvider`
-
-Enhanced provider for Next.js applications.
-
-**Additional Props:**
-- `routeMapping` (Object): Map of routes to data sources
-- `defaultSource` (String|Function): Default data source if no route match
-
-#### `withServerSideData`
-
-HOC for Next.js getServerSideProps.
-
-**Parameters:**
-- `getServerSideProps` (Function, optional): Original getServerSideProps
-- `options` (Object): Data fetching options
-
-#### `createApiRoute`
-
-Helper for creating secure Next.js API routes.
-
-**Parameters:**
-- `handler` (Function): API route handler function
-- `options` (Object): Security and validation options
-
-
-# The Value of RainfallJS vs. Vanilla Context API
-
-When developers evaluate a new package, they often ask: "Why should I use this instead of what I already know?" Let's compare using RainfallJS to implementing data management with vanilla React Context API:
-
-## Using Vanilla React Context API
-
-```jsx
-// 1. Create a context
-const UserContext = React.createContext(null);
-
-// 2. Create a provider component with data fetching logic
-function UserProvider({ children }) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/users');
-        if (!response.ok) throw new Error('Failed to fetch');
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    fetchData();
-  }, []);
-  
-  return (
-    <UserContext.Provider value={{ data, loading, error }}>
-      {children}
-    </UserContext.Provider>
-  );
-}
-
-// 3. Create a custom hook
-function useUserData() {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error('useUserData must be used within a UserProvider');
-  }
-  return context;
-}
-
-// 4. Implement in components
-function UserProfile() {
-  const { data, loading, error } = useUserData();
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return <div>{data.name}</div>;
-}
-
-// 5. Usage
-function App() {
-  return (
-    <UserProvider>
-      <UserProfile />
-    </UserProvider>
-  );
-}
-```
-
-## Using RainfallJS
-
-```jsx
-import { DataProvider, useData } from '@morf_engineering/rainfalljs';
-
-// 1. Component implementation
-function UserProfile() {
-  const { data, loading, error } = useData();
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return <div>{data.name}</div>;
-}
-
-// 2. Usage
-function App() {
-  return (
-    <DataProvider source="/api/users">
-      <UserProfile />
-    </DataProvider>
-  );
-}
-```
-
-## The Value RainfallJS Adds
-
-1. **Eliminates Boilerplate**: With vanilla Context, you need to create a context, provider, fetch logic, state management, and custom hooks for *each data source* in your application. RainfallJS handles all this with a single reusable component.
-
-2. **Standardized Error Handling**: Consistent error management across all data sources without duplicating try/catch logic.
-
-3. **Flexible Data Sources**: RainfallJS accepts API endpoints, functions, or static data, with the same consistent interface.
-
-4. **Route-Based Data in Next.js**: Automatic data fetching based on current route, saving dozens of lines of code per page.
-
-5. **Component Library Integration**: Automatic mapping of data to UI component props, eliminating tedious data transformation code.
-
-6. **Security Built-In**: Authentication headers, data validation, and other security features that you'd need to implement manually with Context.
-
-7. **Production-Ready**: Implements best practices for performance, caching, and server-side rendering that would take significant effort to build correctly with Context API.
-
-8. **Consistent API**: No need to create and remember different context hook names for different data types.
-
-For a real-world application with 10+ data sources and 20+ components, RainfallJS can eliminate hundreds of lines of repetitive context creation and data fetching code while providing more features and better reliability.
-
-
-# FAQ
-
-## What is RainfallJS?
-
-RainfallJS is a specialized data integration solution for React and Next.js applications that makes it easy to fetch, manage, and distribute data across your components with minimal boilerplate.
-
-## Does RainfallJS use React's Context API?
-
-Yes, RainfallJS is built on top of React's Context API. Rather than replacing Context, it enhances it with automated data fetching, transformation, validation, and error handling capabilities specifically designed for component data management.
-
-## What problem does RainfallJS solve?
-
-RainfallJS solves several common issues in React/Next.js applications:
-
-1. **Repetitive data fetching logic** - No need to write the same fetch/state management code for every data source
-2. **Prop drilling** - Access data anywhere in your component tree without passing props through multiple layers
-3. **Loading & error states** - Unified handling of loading indicators and error messages
-4. **Next.js specific challenges** - Integration with SSR and route-based data fetching
-5. **Security concerns** - Built-in authentication header management and data validation
-
-## How is this different from Redux, MobX, or React Query?
-
-- **Redux/MobX**: RainfallJS is more lightweight and focused specifically on component data needs rather than global application state.
-- **React Query**: While React Query is excellent for data fetching, RainfallJS provides a more unified context-based approach for data sharing across components and includes Next.js-specific optimizations.
-- **SWR**: Similar to React Query, SWR focuses on data fetching and caching. RainfallJS provides a more complete data distribution system with both hooks and HOCs.
-
-## Can I use RainfallJS with class components?
-
-Yes! While many modern data libraries only work with hooks, RainfallJS supports both functional components (via the `useData` hook) and class components (via the `withData` HOC).
-
-## Does RainfallJS work with Server-Side Rendering (SSR)?
-
-Absolutely. RainfallJS has specific features for Next.js that support SSR through the `withServerSideData` higher-order component, ensuring your data is available during server rendering.
-
-## Can I transform or validate data before it reaches my components?
-
-Yes, RainfallJS allows you to provide transformation and validation functions as options:
-
-```jsx
-<DataProvider 
-  source="/api/data"
-  options={{
-    transform: (data) => {
-      // Transform data before it reaches components
-      return data.map(item => ({
-        ...item,
-        fullName: `${item.firstName} ${item.lastName}`
-      }));
-    },
-    validate: (data) => {
-      // Validate data structure
-      return Array.isArray(data) && data.length > 0;
-    }
-  }}
->
-  <YourComponent />
-</DataProvider>
-```
-
-## Is RainfallJS secure?
-
-RainfallJS includes built-in security features, including:
-- Authentication header management
-- Data validation before rendering
-- API route protection helpers for Next.js
-- Error sanitization to prevent leaking sensitive information
-
-## How can I contribute to RainfallJS?
-
-Contributions are welcome! Please feel free to submit a pull request or open an issue on our [GitHub repository](https://github.com/morf_engineering/rainfalljs).
-
-## Can I use RainfallJS in production?
-
-Yes, RainfallJS is designed for production use in React and Next.js applications. The package is optimized for performance and has minimal dependencies.
-
-## Can I develop complex apps with RainfallJS?
-
-RainfallJS could certainly be used to build complex applications, but with a different architectural approach than Redux for example.
-Here's how you could build complex apps with RainfallJS:
-
-Composable Data Providers: Users can nest multiple DataProviders for different sections of the application, creating a hierarchy of data sources that maps to the component structure.
-Domain-Specific Providers: Each feature area could have its own DataProvider with specific transformations and validations, allowing separation of concerns.
-Hybrid Approach: RainfallJS could handle all the data fetching and distribution needs, while using simpler state management (like useReducer) for UI state and interactions.
-Cross-Provider Communication: For interactions between data domains, users could implement custom data sources that access and combine data from multiple endpoints.
-
-The key difference is philosophical:
-
-Redux centralizes all state in a single store with explicit actions
-RainfallJS distributes data management closer to where it's used, following React's component model
-
-For many complex applications, RainfallJS's approach may actually be more maintainable because it:
-
-Keeps data concerns closer to the components that need them
-Results in more modular, decoupled code
-Aligns better with React's component-based architecture
-
-The trade-off is that RainfallJS doesn't offer some of Redux's specialized tools like time-travel debugging or the Redux DevTools. However, for most applications focused on data fetching and component integration, these tools aren't essential, and the simplicity benefits outweigh this loss.
+The component mapper survives, rewritten without React: `/mapper`, pure functions,
+described by a JSON catalogue any language can read.
 
 ## License
 

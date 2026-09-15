@@ -1,11 +1,6 @@
-// jest.config.js
+// Plain CommonJS tests over plain CommonJS sources — no transform needed.
+// The babel pipeline left with the React runtime in 0.3.0.
 module.exports = {
   testEnvironment: 'node',
-  transform: {
-    '^.+\\.(js|jsx)$': ['babel-jest', { configFile: './.babelrc' }]
-  },
-  transformIgnorePatterns: [
-    '/node_modules/(?!(@morf_engineering)/)'
-  ],
-  moduleFileExtensions: ['js', 'json', 'jsx', 'node']
+  moduleFileExtensions: ['js', 'json', 'node'],
 };
