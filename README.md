@@ -283,6 +283,52 @@ See [`RECOMMENDATION.md`](RECOMMENDATION.md) for the rationale and
 
 ---
 
+## The worked demo — real numbers you can re-run
+
+[`examples/fintech-demo/`](examples/fintech-demo/) is a complete Next.js finance app —
+accounts, transactions, budgets, net worth, insights — with a `rainfall.json` describing
+it. It exists so the token claim is a measurement rather than a promise.
+
+[`TOKENS.md`](examples/fintech-demo/TOKENS.md) is the output of `rainfall report` against
+those files, not an estimate:
+
+```
+Condensed digest:            ~726 tokens   (what an AI reads instead)
+Mapped source files:         ~3631 tokens  (16 files the manifest describes)
+All project source files:    ~3699 tokens  (17 files, blind-exploration ceiling)
+
+Savings vs reading mapped files:   5.0x fewer tokens per session
+Savings vs exploring the project:  5.1x fewer tokens per session
+```
+
+Scoped to one work item — everything an agent needs to change the add-transaction form
+and nothing else:
+
+```
+~233 tokens focused on "form.transactions.add"   (full digest: ~726)
+```
+
+Roughly **16x** less than reading the project, for a task-sized context.
+
+Re-run it yourself:
+
+```bash
+cd examples/fintech-demo
+npx @morf_engineering/rainfalljs report
+npx @morf_engineering/rainfalljs condense --focus form.transactions.add
+```
+
+[`GROK_PROMPT.md`](examples/fintech-demo/GROK_PROMPT.md) is the prompt used to test
+whether an agent given only the digest can make a correct change — the part that decides
+whether the saving is real or just smaller.
+
+> **Read the numbers honestly.** They compare a digest against reading source files, on
+> one small app. A larger codebase moves the ratio up, and a task that genuinely needs
+> the source still needs the source. The digest tells an agent *where to look*; it does
+> not replace looking.
+
+---
+
 ## FAQ
 
 ### Does this work with frontends that aren't JavaScript?

@@ -9,22 +9,32 @@ use the standard ~4 characters/token heuristic.
 ```
 Rainfall tokens-saved report — fintrack
 
-Condensed digest:            ~726 tokens   (what an AI reads instead)
+Condensed digest:            ~726 tokens  (what an AI reads instead)
 Mapped source files:         ~3631 tokens  (16 files the manifest describes)
-All project source files:    ~4977 tokens  (19 files, blind-exploration ceiling)
+All project source files:    ~3699 tokens  (17 files, blind-exploration ceiling)
 
 Savings vs reading mapped files:  5.0x fewer tokens per session
-Savings vs exploring the project: 6.9x fewer tokens per session
+Savings vs exploring the project: 5.1x fewer tokens per session
+
+Estimates use ~4 characters per token. Every AI session pays the reading
+cost again from scratch; the digest cost is all it needs to pay instead.
 ```
 
 Scoped to a single work item (what an agent needs to modify the add-transaction
 form and everything it touches):
 
 ```
-~233 tokens focused on "form.transactions.add"  (full digest: ~726)
+F002 add-transaction: ui:form.transactions.add → api:API-003 → entity:Transaction → entity:Account → api:API-002 → ui:table.transactions.list
 ```
 
-That's **~21x** less than reading the whole project — for a task-sized context.
+That is roughly **16x** less than reading the whole project, for a task-sized context.
+
+**Regenerate these numbers, do not trust them.** They are the literal output of
+`npx @morf_engineering/rainfalljs report` in this directory, and they moved once
+already: an earlier version of this file reported 19 files / ~4977 tokens and a 6.9x
+exploration saving, counting `.gitignore` and a `.claude/` skill file as project source.
+The walker excludes dotfiles now, which is the more honest count — and the multiple
+dropped accordingly. A measurement nobody re-runs becomes a claim.
 
 ## How to read these numbers honestly
 
