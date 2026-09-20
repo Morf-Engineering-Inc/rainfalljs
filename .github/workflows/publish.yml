@@ -58,6 +58,23 @@ jobs:
             echo "::warning::No OIDC token in this job — GitHub did not grant id-token: write. Trusted Publishing cannot work until it does."
           fi
 
+      # A release-triggered run and a workflow_dispatch run can land on the same
+      # version. 0.4.0 was published by dispatch and tagged afterwards; the
+      # release event then replayed this job against a version already on the
+      # registry. npm answers E403 for that, which reads like an auth failure
+      # and is not one. Check first so the tag can be created at any time.
+      - name: Already on the registry?
+        id: published
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::$NAME@$VERSION is already on the registry - skipping publish."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish
         # NO `env: NODE_AUTH_TOKEN` here, deliberately.
         #
@@ -74,4 +91,5 @@ jobs:
         #
         # If a token is ever needed again, add it back as a separate step guarded
         # by `if: secrets.NPM_TOKEN != ''` rather than as an always-empty env.
+        if: steps.published.outputs.skip == 'false'
         run: npm publish --access public
