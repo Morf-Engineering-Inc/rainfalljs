@@ -50,6 +50,23 @@ describe('package manifest', () => {
     }
   });
 
+  it('every `bin` target is declared without a "./" prefix', () => {
+    // npm normalises every bin value through secureAndUnixifyPath, which strips a
+    // leading "./". When the normalised path differs from the declared one, every
+    // publish prints:
+    //
+    //   npm warn publish "bin[rainfall]" script name bin/rainfall.js was invalid and removed
+    //
+    // Nothing is removed - @npmcli/package-json assigns the corrected value on the
+    // next line - but the wording is identical in shape to the warnings that DO
+    // drop a bin, so a real one would read as routine noise. #46.
+    //
+    // `exports` is the opposite: Node's spec requires the "./" there. bin only.
+    for (const [name, target] of Object.entries(pkg.bin || {})) {
+      expect({ name, target }).toEqual({ name, target: target.replace(/^\.\//, '') });
+    }
+  });
+
   it('`files` covers everything bin, main and exports depend on', () => {
     const covered = (p) =>
       pkg.files.some((f) => p === f || p.startsWith(`${f}/`) || f.startsWith(`${p}/`));

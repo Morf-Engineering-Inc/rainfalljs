@@ -72,7 +72,7 @@
     }
   },
   "bin": {
-    "rainfall": "./bin/rainfall.js"
+    "rainfall": "bin/rainfall.js"
   },
   "types": "dist/datamap/index.d.ts"
 }
