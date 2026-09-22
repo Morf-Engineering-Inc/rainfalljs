@@ -10,7 +10,7 @@ writeFileSync(
       $schema: 'https://raw.githubusercontent.com/Morf-Engineering-Inc/rainfalljs/main/schema/components.schema.json',
       rainfallComponents: '1.0',
       description:
-        'Component shapes: what each UI component type accepts as data and produces as props. Language-agnostic — the JS mappings in @morf_engineering/rainfalljs/mapper implement these, but any frontend in any language can read this file and implement them natively.',
+        'Component shapes: what each UI component type accepts as data and produces as props. Language-agnostic — the JS mappings in rainfalljs/mapper implement these, but any frontend in any language can read this file and implement them natively.',
       shapes: CATALOGUE,
     },
     null,

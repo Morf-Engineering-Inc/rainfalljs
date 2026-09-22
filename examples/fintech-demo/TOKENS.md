@@ -30,7 +30,7 @@ F002 add-transaction: ui:form.transactions.add → api:API-003 → entity:Transa
 That is roughly **16x** less than reading the whole project, for a task-sized context.
 
 **Regenerate these numbers, do not trust them.** They are the literal output of
-`npx @morf_engineering/rainfalljs report` in this directory, and they moved once
+`npx rainfalljs report` in this directory, and they moved once
 already: an earlier version of this file reported 19 files / ~4977 tokens and a 6.9x
 exploration saving, counting `.gitignore` and a `.claude/` skill file as project source.
 The walker excludes dotfiles now, which is the more honest count — and the multiple

@@ -6,9 +6,9 @@
 # RainfallJS
 
 [![Tests](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml/badge.svg)](https://github.com/Morf-Engineering-Inc/rainfalljs/actions/workflows/test.yml)
-[![npm version](https://img.shields.io/npm/v/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
-[![npm downloads](https://img.shields.io/npm/dm/@morf_engineering/rainfalljs.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs)
-[![zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](https://www.npmjs.com/package/@morf_engineering/rainfalljs?activeTab=dependencies)
+[![npm version](https://img.shields.io/npm/v/rainfalljs.svg)](https://www.npmjs.com/package/rainfalljs)
+[![npm downloads](https://img.shields.io/npm/dm/rainfalljs.svg)](https://www.npmjs.com/package/rainfalljs)
+[![zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](https://www.npmjs.com/package/rainfalljs?activeTab=dependencies)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **One map of your data layer — front end, middle, back end — that your build keeps
@@ -96,12 +96,12 @@ route, an API client and a Lambda, and **no row in the surface register**.
 ## Install
 
 ```bash
-npx @morf_engineering/rainfalljs init     # no install needed
-npx @morf_engineering/rainfalljs scan     # seed it from your code
+npx rainfalljs init     # no install needed
+npx rainfalljs scan     # seed it from your code
 ```
 
 ```bash
-npm install -D @morf_engineering/rainfalljs
+npm install -D rainfalljs
 npx rainfall validate
 ```
 
@@ -180,7 +180,7 @@ that library changes.
 ### If you are in JS
 
 ```js
-import { useGenericMappings, mapProps } from '@morf_engineering/rainfalljs/mapper';
+import { useGenericMappings, mapProps } from 'rainfalljs/mapper';
 
 useGenericMappings();
 
@@ -192,7 +192,7 @@ A mapping is a pure function — `(data, options) => props`. No React, no hooks,
 Register your own on top:
 
 ```js
-import { defineMappings } from '@morf_engineering/rainfalljs/mapper';
+import { defineMappings } from 'rainfalljs/mapper';
 
 defineMappings('acme', {
   Table: (data, { headers = {} }) => ({
@@ -214,7 +214,7 @@ The same model, as a TypeScript module, when you want to query it in a test or a
 rather than print it:
 
 ```js
-import { defineDataMap, validate, brief } from '@morf_engineering/rainfalljs';
+import { defineDataMap, validate, brief } from 'rainfalljs';
 
 const map = defineDataMap({
   name: 'Acme',
@@ -267,7 +267,7 @@ manifest on its own.
 Or have it build one for you:
 
 ```bash
-npx @morf_engineering/rainfalljs prompt
+npx rainfalljs prompt
 ```
 
 Paste the output into Claude, Cursor, or any coding assistant. `scan` finds the
@@ -319,8 +319,8 @@ Re-run it yourself:
 
 ```bash
 cd examples/fintech-demo
-npx @morf_engineering/rainfalljs report
-npx @morf_engineering/rainfalljs condense --focus form.transactions.add
+npx rainfalljs report
+npx rainfalljs condense --focus form.transactions.add
 ```
 
 [`GROK_PROMPT.md`](examples/fintech-demo/GROK_PROMPT.md) is the prompt used to test
@@ -364,7 +364,7 @@ outlive it: `rainfall.json` is a plain file you could hand-write and read with
 If you want the check in a non-Node CI, one step with `npx` covers it:
 
 ```yaml
-- run: npx @morf_engineering/rainfalljs validate
+- run: npx rainfalljs validate
 ```
 
 ### Will `rainfall scan` understand my Swift / Python / Go project?
@@ -378,7 +378,7 @@ endpoint, the flows — require understanding the code, which is why the recomme
 path on *every* stack is:
 
 ```bash
-npx @morf_engineering/rainfalljs prompt
+npx rainfalljs prompt
 ```
 
 and hand the output to an AI assistant, which reads your models and handlers and writes

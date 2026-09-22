@@ -29,6 +29,10 @@ const root = path.join(__dirname, '..');
 const abs = (p) => path.join(root, p.replace(/^\.\//, ''));
 
 describe('package manifest', () => {
+  it('is published under the unscoped npm package name', () => {
+    expect(pkg.name).toBe('rainfalljs');
+  });
+
   it('every path named in `exports` exists', () => {
     for (const [sub, entry] of Object.entries(pkg.exports)) {
       const targets = typeof entry === 'string' ? [entry] : Object.values(entry);

@@ -75,7 +75,7 @@ the project and let the library become one of several consumers of the manifest.
 
 ## Suggested next steps (not in this PR)
 
-1. Publish the CLI so `npx @morf_engineering/rainfalljs` works as a true "download".
+1. Publish the CLI so `npx rainfalljs` works as a true "download".
 2. Add `rainfall sync` — detect drift between manifest and code, the way the scan
    detects new code.
 3. Optional MCP server exposing `condense`/lookup as tools, so agents query the

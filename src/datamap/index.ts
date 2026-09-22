@@ -6,7 +6,7 @@
  * loaded by a test, a CI job, a docs generator or an AI agent that needs the shape
  * of a system without reading the system.
  *
- *   import { defineDataMap, validate, brief } from "@morf_engineering/rainfalljs/datamap";
+ *   import { defineDataMap, validate, brief } from "rainfalljs/datamap";
  *
  *   const map = defineDataMap({ name: "Acme", endpoints: [...], screens: [...] });
  *   const problems = validate(map);   // run this in CI
