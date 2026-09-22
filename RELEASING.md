@@ -2,7 +2,7 @@
 
 Releases are done by the **"Publish Package to NPM"** GitHub Actions workflow
 (`.github/workflows/publish.yml`). It runs the tests, builds, and publishes
-`@morf_engineering/rainfalljs`. Trigger it from the repo's **Actions** tab
+`rainfalljs`. Trigger it from the repo's **Actions** tab
 ("Run workflow" on `main`) or by creating a GitHub release.
 
 ## Authentication — pick one
@@ -12,7 +12,7 @@ Releases are done by the **"Publish Package to NPM"** GitHub Actions workflow
 One-time setup on npmjs.com (works from any browser, including a phone):
 
 1. Sign in at npmjs.com and open the package page:
-   `https://www.npmjs.com/package/@morf_engineering/rainfalljs`
+   `https://www.npmjs.com/package/rainfalljs`
 2. Go to **Settings** → **Trusted Publisher** (publishing access).
 3. Choose **GitHub Actions** and enter:
    - Organization or user: `Morf-Engineering-Inc`
@@ -36,4 +36,4 @@ short token lifetimes, so this needs periodic rotation — prefer Option A.
 1. Bump `version` in `package.json` (semver) and update `CHANGELOG.md`.
 2. Merge to `main` with CI green.
 3. Run the publish workflow from the Actions tab.
-4. Verify: `npm view @morf_engineering/rainfalljs version`.
+4. Verify: `npm view rainfalljs version`.

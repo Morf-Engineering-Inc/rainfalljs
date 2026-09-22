@@ -91,7 +91,7 @@ NEW_VERSION=$(node -p "require('./package.json').version")
 echo -e "${GREEN}Updated version to: ${NEW_VERSION}${NC}"
 
 # Confirm publishing
-echo -e "\n${YELLOW}Ready to publish @morf_engineering/rainfalljs@${NEW_VERSION} to npm.${NC}"
+echo -e "\n${YELLOW}Ready to publish rainfalljs@${NEW_VERSION} to npm.${NC}"
 read -p "Proceed with publishing? (y/n): " PUBLISH_CONFIRM
 
 if [[ ! $PUBLISH_CONFIRM =~ ^[Yy]$ ]]; then
@@ -107,7 +107,7 @@ if [ $? -ne 0 ]; then
   echo -e "${RED}Publishing failed. Please check for errors.${NC}"
   exit 1
 else
-  echo -e "${GREEN}Successfully published @morf_engineering/rainfalljs@${NEW_VERSION} to npm!${NC}"
+  echo -e "${GREEN}Successfully published rainfalljs@${NEW_VERSION} to npm!${NC}"
 fi
 
 # Push to GitHub if not using custom version

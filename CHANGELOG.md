@@ -100,7 +100,7 @@ Documentation only. No code change.
 - **`schema/components.json`** — that catalogue as data, so a SwiftUI, Flutter,
   Blazor, Django or Rails frontend can read the same contract and implement it
   natively. The JS mappings are a convenience, not the point.
-- **`@morf_engineering/rainfalljs/mapper`** — component mapping without React. Pure
+- **`rainfalljs/mapper`** — component mapping without React. Pure
   `(data, options) => props`. The 0.2.x mapper called `useData()` internally, so it
   only ran inside a React tree, which is why it was never tested.
 - **The Data Map** (`defineDataMap`, `validate`, `brief`) — the typed model, adding

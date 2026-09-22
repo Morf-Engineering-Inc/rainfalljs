@@ -18,11 +18,11 @@ docs generator or an AI agent can load the shape of a system without reading the
 system.
 
 ```bash
-npm install @morf_engineering/rainfalljs
+npm install rainfalljs
 ```
 
 ```js
-import { defineDataMap, validate, brief } from "@morf_engineering/rainfalljs/datamap";
+import { defineDataMap, validate, brief } from "rainfalljs/datamap";
 ```
 
 The runtime half of RainfallJS (`DataProvider`, `useData`) is separate and optional.
@@ -59,7 +59,7 @@ fails when it is not.
 Four flat arrays. Ids are yours; they are the only thing the layers share.
 
 ```js
-import { defineDataMap } from "@morf_engineering/rainfalljs/datamap";
+import { defineDataMap } from "rainfalljs/datamap";
 
 export const map = defineDataMap({
   name: "Acme",
@@ -160,7 +160,7 @@ loadable precisely when it is wrong, or you cannot use it to find out what is wr
 ## Validating
 
 ```js
-import { validate, isValid, findings } from "@morf_engineering/rainfalljs/datamap";
+import { validate, isValid, findings } from "rainfalljs/datamap";
 
 const list = validate(map);
 console.log(findings(list));
@@ -198,7 +198,7 @@ Two worth explaining:
 ## Reporting
 
 ```js
-import { brief, markdown, mermaid } from "@morf_engineering/rainfalljs/datamap";
+import { brief, markdown, mermaid } from "rainfalljs/datamap";
 
 brief(map)               // the dense map, for a context window
 markdown(map)            // tables, for a doc or a PR

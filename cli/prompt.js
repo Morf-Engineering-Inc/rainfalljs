@@ -9,8 +9,8 @@ const BOOTSTRAP_PROMPT = `You are helping me create and maintain a Rainfall mani
 
 Run these and use their output as the starting skeleton (or, if the CLI is unavailable, create rainfall.json by hand following the format below):
 
-    npx @morf_engineering/rainfalljs init
-    npx @morf_engineering/rainfalljs scan
+    npx rainfalljs init
+    npx rainfalljs scan
 
 The scan is heuristic: it finds components, API routes, and fetch calls, but it guesses. Prune anything that isn't a real screen component or endpoint (helpers, tests, config).
 
@@ -25,8 +25,8 @@ Rules: ids are permanent — continue existing sequences, never renumber. If the
 
 ## Step 3 — Verify
 
-    npx @morf_engineering/rainfalljs validate   # must pass with no errors; fix warnings
-    npx @morf_engineering/rainfalljs report     # show me the tokens-saved numbers
+    npx rainfalljs validate   # must pass with no errors; fix warnings
+    npx rainfalljs report     # show me the tokens-saved numbers
 
 ## Step 4 — Keep it true (standing instruction)
 
